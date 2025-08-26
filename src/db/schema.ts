@@ -18,13 +18,13 @@ import {
   ])
   
   export const rankEnum = pgEnum('rank', [
-    'IRON_4', 'IRON_3', 'IRON_2', 'IRON_1',
-    'BRONZE_4', 'BRONZE_3', 'BRONZE_2', 'BRONZE_1',
-    'SILVER_4', 'SILVER_3', 'SILVER_2', 'SILVER_1',
-    'GOLD_4', 'GOLD_3', 'GOLD_2', 'GOLD_1',
-    'PLATINUM_4', 'PLATINUM_3', 'PLATINUM_2', 'PLATINUM_1',
-    'EMERALD_4', 'EMERALD_3', 'EMERALD_2', 'EMERALD_1',
-    'DIAMOND_4', 'DIAMOND_3', 'DIAMOND_2', 'DIAMOND_1',
+    'IRON_I', 'IRON_II', 'IRON_III', 'IRON_IV',
+    'BRONZE_I', 'BRONZE_II', 'BRONZE_III', 'BRONZE_IV',
+    'SILVER_I', 'SILVER_II', 'SILVER_III', 'SILVER_IV',
+    'GOLD_I', 'GOLD_II', 'GOLD_III', 'GOLD_IV',
+    'PLATINUM_I', 'PLATINUM_II', 'PLATINUM_III', 'PLATINUM_IV',
+    'EMERALD_I', 'EMERALD_II', 'EMERALD_III', 'EMERALD_IV',
+    'DIAMOND_I', 'DIAMOND_II', 'DIAMOND_III', 'DIAMOND_IV',
     'MASTER', 'GRANDMASTER', 'CHALLENGER'
   ])
   
@@ -55,8 +55,8 @@ import {
     
     summonerName: text('summoner_name'),
     region: regionEnum('region'),
-    currentRank: rankEnum('current_rank'),
-    peakRank: rankEnum('peak_rank'),
+    soloRank: rankEnum('solo_rank'),
+    flexRank: rankEnum('flex_rank'),
     mainRole: roleEnum('main_role'),
     secondaryRole: roleEnum('secondary_role'),
     bio: text('bio'),

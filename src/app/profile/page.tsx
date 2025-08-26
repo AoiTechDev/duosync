@@ -26,7 +26,8 @@ export default async function ProfilePage() {
               <p><strong>Name:</strong> {user.name || "Not set"}</p>
               <p><strong>Summoner Name:</strong> {user.summonerName || "Not set"}</p>
               <p><strong>Region:</strong> {user.region || "Not set"}</p>
-              <p><strong>Current Rank:</strong> {user.currentRank || "Not set"}</p>
+              <p><strong>Solo/Duo Rank:</strong> {user.soloRank || "Unranked"}</p>
+              <p><strong>Flex Rank:</strong> {user.flexRank || "Unranked"}</p>
               <p><strong>Main Role:</strong> {user.mainRole || "Not set"}</p>
               <p><strong>Bio:</strong> {user.bio || "Not set"}</p>
               <p><strong>Created:</strong> {user.createdAt?.toLocaleDateString()}</p>

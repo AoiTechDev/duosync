@@ -30,9 +30,18 @@ const REGIONAL_ENDPOINTS = {
 }
 
 interface RankedEntry {
+  leagueId: string;
   queueType: string;
   tier: string;
   rank: string;
+  puuid: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  veteran: boolean;
+  inactive: boolean;
+  freshBlood: boolean;
+  hotStreak: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -88,17 +97,27 @@ export async function POST(request: NextRequest) {
     
     const summoner = await summonerResponse.json()
     
-    // Get rank information
+    // Get rank information using PUUID
     const rankedResponse = await fetch(
-      `https://${platformEndpoint}/lol/league/v4/entries/by-summoner/${summoner.id}?api_key=${RIOT_API_KEY}`
+      `https://${platformEndpoint}/lol/league/v4/entries/by-puuid/${account.puuid}?api_key=${RIOT_API_KEY}`
     )
     
-    let currentRank = 'UNRANKED'
+    let soloRank = null
+    let flexRank = null
+    
     if (rankedResponse.ok) {
       const rankedData: RankedEntry[] = await rankedResponse.json()
+      
+      // Get Solo/Duo rank
       const soloQueue = rankedData.find((entry) => entry.queueType === 'RANKED_SOLO_5x5')
       if (soloQueue) {
-        currentRank = `${soloQueue.tier}_${soloQueue.rank}`
+        soloRank = `${soloQueue.tier}_${soloQueue.rank}`
+      }
+      
+      // Get Flex rank
+      const flexQueue = rankedData.find((entry) => entry.queueType === 'RANKED_FLEX_SR')
+      if (flexQueue) {
+        flexRank = `${flexQueue.tier}_${flexQueue.rank}`
       }
     }
     
@@ -109,7 +128,8 @@ export async function POST(request: NextRequest) {
         gameName: account.gameName,
         tagLine: account.tagLine,
         level: summoner.summonerLevel,
-        currentRank,
+        soloRank,
+        flexRank,
         puuid: account.puuid,
         summonerId: summoner.id
       }

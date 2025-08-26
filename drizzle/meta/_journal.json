@@ -15,6 +15,20 @@
       "when": 1756166523082,
       "tag": "0001_complete_karen_page",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756240884089,
+      "tag": "0002_complex_starhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1756241495437,
+      "tag": "0003_mute_stone_men",
+      "breakpoints": true
     }
   ]
 }

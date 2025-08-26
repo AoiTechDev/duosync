@@ -4,8 +4,7 @@ import { useOnboardingStore } from '@/store/onboarding-store'
 const steps = [
   { number: 1, title: 'Basic Info' },
   { number: 2, title: 'Riot Account' },
-  { number: 3, title: 'Preferences' },
-  { number: 4, title: 'Availability' }
+  { number: 3, title: 'Preferences' }
 ]
 
 export function OnboardingProgress() {

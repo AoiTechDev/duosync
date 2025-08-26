@@ -11,7 +11,8 @@ interface RankData {
   summonerName: string;
   gameName: string;
   tagLine: string;
-  currentRank?: string;
+  soloRank?: string;
+  flexRank?: string;
   level: number;
 }
 
@@ -53,7 +54,8 @@ export default function RiotAccountStep() {
           gameName: gameName.trim(),
           tagLine: tagLine.trim(),
           riotVerified: true,
-          currentRank: result.data.currentRank,
+          soloRank: result.data.soloRank,
+          flexRank: result.data.flexRank,
         });
       } else {
         setVerificationStatus("error");
@@ -79,7 +81,8 @@ export default function RiotAccountStep() {
       gameName: "",
       tagLine: "",
       riotVerified: false,
-      currentRank: undefined,
+      soloRank: undefined,
+      flexRank: undefined,
     });
     nextStep();
   };
@@ -152,9 +155,12 @@ export default function RiotAccountStep() {
                   Account Verified!
                 </h3>
                 <p className="text-green-700">
-                  {rankData.summonerName} • {rankData.currentRank || "Unranked"}{" "}
-                  • Level {rankData.level}
+                  {rankData.summonerName} • Level {rankData.level}
                 </p>
+                <div className="text-sm text-green-600 mt-1">
+                  <div>Solo/Duo: {rankData.soloRank || "Unranked"}</div>
+                  <div>Flex: {rankData.flexRank || "Unranked"}</div>
+                </div>
               </div>
             </div>
           </Card>
