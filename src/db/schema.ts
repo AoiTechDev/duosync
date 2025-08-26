@@ -7,9 +7,11 @@ import {
     pgEnum,
     uuid,
     integer,
-    unique
+    unique,
+    primaryKey
   } from 'drizzle-orm/pg-core'
   import { relations } from 'drizzle-orm'
+  import type { AdapterAccount } from "next-auth/adapters"
   
   export const roleEnum = pgEnum('role', [
     'TOP', 'JUNGLE', 'MID', 'ADC', 'SUPPORT', 'FILL'
@@ -37,10 +39,16 @@ import {
   export const friendshipStatusEnum = pgEnum('friendship_status', [
     'PENDING', 'ACCEPTED', 'BLOCKED'
   ])
-  
+
+  // NextAuth adapter tables
   export const users = pgTable('users', {
     id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name'),
     email: text('email').unique().notNull(),
+    emailVerified: timestamp('emailVerified', { mode: 'date' }),
+    image: text('image'),
+    
+    // Custom fields
     username: text('username').unique().notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -59,6 +67,38 @@ import {
     goals: json('goals').$type<string[]>(),
     availability: json('availability'),
   })
+
+  export const accounts = pgTable('accounts', {
+    userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').$type<AdapterAccount['type']>().notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  }, (account) => ({
+    compoundKey: primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  }))
+
+  export const sessions = pgTable('sessions', {
+    sessionToken: text('sessionToken').primaryKey(),
+    userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
+  })
+
+  export const verificationTokens = pgTable('verificationTokens', {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
+  }, (vt) => ({
+    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  }))
   
   export const posts = pgTable('posts', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -105,14 +145,25 @@ import {
   }, (table) => ({
     uniqueLike: unique().on(table.userId, table.postId)
   }))
-  
+
+  // Relations
   export const usersRelations = relations(users, ({ many }) => ({
+    accounts: many(accounts),
+    sessions: many(sessions),
     posts: many(posts),
     sentMessages: many(messages, { relationName: 'messageSender' }),
     receivedMessages: many(messages, { relationName: 'messageReceiver' }),
     sentFriendships: many(friendships, { relationName: 'friendshipSender' }),
     receivedFriendships: many(friendships, { relationName: 'friendshipReceiver' }),
     likes: many(likes),
+  }))
+
+  export const accountsRelations = relations(accounts, ({ one }) => ({
+    user: one(users, { fields: [accounts.userId], references: [users.id] }),
+  }))
+
+  export const sessionsRelations = relations(sessions, ({ one }) => ({
+    user: one(users, { fields: [sessions.userId], references: [users.id] }),
   }))
   
   export const postsRelations = relations(posts, ({ one, many }) => ({
