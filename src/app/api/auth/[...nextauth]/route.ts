@@ -1,9 +1,10 @@
-	import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -22,13 +23,12 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       if (!user.email) {
         return false;
       }
 
       try {
-        // Check if user already exists
         const existingUser = await db
           .select()
           .from(users)
@@ -36,7 +36,6 @@ export const authOptions: NextAuthOptions = {
           .limit(1);
 
         if (existingUser.length === 0) {
-          // Create new user if doesn't exist
           await db.insert(users).values({
             email: user.email,
             username: user.name || user.email.split("@")[0],
@@ -54,7 +53,7 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
-    async session({ session, token }) {
+    async session({ session }) {
       if (session.user?.email) {
         const dbUser = await db
           .select()
@@ -78,6 +77,12 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
       }
       return token;
+    },
+
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`; // Let middleware handle smart routing
     },
   },
   debug: process.env.NODE_ENV === "development",

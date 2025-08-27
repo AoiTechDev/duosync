@@ -36,7 +36,7 @@ export function getFormattedRank(rank: string | null): string | null {
  * Check if user has completed profile setup
  */
 export function isProfileComplete(user: AuthUser): boolean {
-  return !!(user.username && user.summonerName && user.region && user.mainRole);
+  return !!(user.username && user.mainRole);
 }
 
 /**

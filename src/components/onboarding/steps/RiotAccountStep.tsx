@@ -99,7 +99,7 @@ export default function RiotAccountStep() {
       <div className="space-y-4">
         <div className="space-y-3">
           <Label htmlFor="gameName">Riot ID</Label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-col sm:flex-row">
             <Input
               id="gameName"
               value={gameName}
@@ -111,60 +111,44 @@ export default function RiotAccountStep() {
               placeholder="Game Name"
               className={error ? "border-red-500" : ""}
             />
-            <div className="flex items-center text-lg font-bold text-gray-400">#</div>
-            <Input
-              id="tagLine"
-              value={tagLine}
-              onChange={(e) => {
-                setTagLine(e.target.value);
-                setVerificationStatus("idle");
-                setError("");
-              }}
-              placeholder="Tag"
-              className={error ? "border-red-500" : ""}
-              maxLength={5}
-            />
-            <Button
-              onClick={handleVerify}
-              disabled={!gameName.trim() || !tagLine.trim() || isVerifying}
-              variant="outline"
-              className="min-w-[100px]"
-            >
-              {isVerifying ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Verify"
-              )}
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center text-lg font-bold text-gray-400">
+                #
+              </div>
+              <Input
+                id="tagLine"
+                value={tagLine}
+                onChange={(e) => {
+                  setTagLine(e.target.value);
+                  setVerificationStatus("idle");
+                  setError("");
+                }}
+                placeholder="Tag"
+                className={`min-w-[150px] ${error ? "border-red-500" : ""}`}
+                maxLength={5}
+              />
+              <Button
+                onClick={handleVerify}
+                disabled={!gameName.trim() || !tagLine.trim() || isVerifying}
+                variant="outline"
+                className="min-w-[100px]"
+              >
+                {isVerifying ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Verify"
+                )}
+              </Button>
+            </div>
           </div>
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           {!error && (
             <p className="text-gray-500 text-sm mt-1">
-              Enter your Riot ID (e.g., GameName#TAG1). You can find this in your Riot Games account.
+              Enter your Riot ID (e.g., GameName#TAG1). You can find this in
+              your Riot Games account.
             </p>
           )}
         </div>
-
-        {/* Verification Status */}
-        {verificationStatus === "success" && rankData && (
-          <Card className="p-4 border-green-200 bg-green-50">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-8 h-8 text-green-500" />
-              <div>
-                <h3 className="font-semibold text-green-800">
-                  Account Verified!
-                </h3>
-                <p className="text-green-700">
-                  {rankData.summonerName} • Level {rankData.level}
-                </p>
-                <div className="text-sm text-green-600 mt-1">
-                  <div>Solo/Duo: {rankData.soloRank || "Unranked"}</div>
-                  <div>Flex: {rankData.flexRank || "Unranked"}</div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
 
         {verificationStatus === "error" && (
           <Card className="p-4 border-red-200 bg-red-50">
@@ -179,18 +163,6 @@ export default function RiotAccountStep() {
             </div>
           </Card>
         )}
-      </div>
-
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h4 className="font-semibold text-blue-800 mb-2">
-          Why verify your account?
-        </h4>
-        <ul className="text-blue-700 text-sm space-y-1">
-          <li>• Automatic rank verification</li>
-          <li>• Better matchmaking with similar skill players</li>
-          <li>• Access to detailed stats and match history</li>
-          <li>• Build trust with other players</li>
-        </ul>
       </div>
 
       <div className="flex justify-between">
@@ -212,4 +184,4 @@ export default function RiotAccountStep() {
       </div>
     </div>
   );
-} 
+}

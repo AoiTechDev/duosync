@@ -1,24 +1,22 @@
-"use client";
-import { useOnboardingStore } from "@/store/onboarding-store";
-import BasicInfoStep from "./steps/BasicInfoStep";
-import RiotAccountStep from "./steps/RiotAccountStep";
-import PreferencesStep from "./steps/PreferencesStep";
+import { getCurrentUser } from "@/auth";
+import { redirect } from "next/navigation";
+import { isProfileComplete } from "@/auth/utils";
+import OnboardingClient from "../../../components/onboarding/OnboardingClient";
 
-export default function OnboardingWizard() {
-  const currentStep = useOnboardingStore(state => state.currentStep);
+export default async function OnboardingPage() {
+  const user = await getCurrentUser();
+  
+  // If no user, middleware should have redirected to login
+  // But let's be safe
+  if (!user) {
+    redirect("/login");
+  }
 
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return <BasicInfoStep />;
-      case 2:
-        return <RiotAccountStep />;
-      case 3:
-        return <PreferencesStep />;
-      default:
-        return <BasicInfoStep />;
-    }
-  };
+  // Check if profile is complete
+  if (isProfileComplete(user)) {
+    redirect("/dashboard");
+  }
 
-  return renderStep();
+  // Profile is incomplete, show onboarding
+  return <OnboardingClient />;
 }

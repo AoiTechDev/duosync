@@ -165,7 +165,7 @@ export default function BasicInfoStep() {
           </Label>
           <Select value={region} onValueChange={setRegion}>
             <SelectTrigger className="h-12 text-base">
-              <SelectValue placeholder="Select your League of Legends region" />
+              <SelectValue placeholder="Select your region" />
             </SelectTrigger>
             <SelectContent>
               {regions.map((r) => (

@@ -89,12 +89,7 @@ const LoginPage = () => {
           <CardContent>
             <div className="space-y-6">
               <AuthButtons />
-              <div className="relative">
-                <Separator />
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-2 text-xs text-muted-foreground">
-                  or
-                </span>
-              </div>
+              
               <p className="text-xs text-muted-foreground">
                 By continuing, you agree to our Terms of Service and Privacy
                 Policy.
