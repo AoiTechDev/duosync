@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import { getCurrentUser } from "@/auth";
 import { redirect } from "next/navigation";
 
-const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
+const FeedLayout = async ({ children }: { children: React.ReactNode }) => {
 
   const user = await getCurrentUser();
 
@@ -16,4 +16,4 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   {children}</>;
 };
 
-export default DashboardLayout;
+export default FeedLayout;

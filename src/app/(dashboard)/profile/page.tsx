@@ -10,4 +10,4 @@ export default async function ProfilePage() {
   }
 
   return <ProfilePageClient user={user} />;
-} 
+}

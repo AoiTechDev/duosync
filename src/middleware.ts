@@ -27,7 +27,7 @@ export default withAuth(
     // For authenticated users visiting home page, redirect to dashboard
     // Let the dashboard/onboarding pages handle their own profile checks
     if (pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/feed", req.url));
     }
 
     return NextResponse.next();

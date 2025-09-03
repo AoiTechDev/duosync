@@ -10,6 +10,7 @@ import {
 } from "@/data/preferences";
 import { AlertCircle } from "lucide-react";
 import Image from "next/image";
+import { TagButton } from "@/components/common/TagButton";
 
 interface PreferencesState {
   mainRole: string;
@@ -236,40 +237,5 @@ export default function PreferencesStep() {
         </Button>
       </div>
     </div>
-  );
-}
-
-// Simple Tag Button Component
-function TagButton({
-  selected,
-  disabled = false,
-  onClick,
-  icon,
-  label,
-}: {
-  selected: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-  icon?: string;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`
-        inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all
-        ${
-          selected
-            ? "bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20"
-            : disabled
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"
-        }
-      `}
-    >
-      {icon && <Image src={icon} alt={label} width={20} height={20} />}
-      <span>{label}</span>
-    </button>
   );
 }

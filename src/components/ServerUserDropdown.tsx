@@ -64,7 +64,7 @@ export function ServerUserDropdown({ user }: ServerUserDropdownProps) {
           <Link href="/profile/edit">Edit Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/feed">Posts</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <SignOutButton />

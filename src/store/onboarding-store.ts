@@ -88,7 +88,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
           if (response.ok) {
             set({ isCompleted: true })
             // Redirect to dashboard
-            window.location.href = '/dashboard'
+            window.location.href = '/feed'
           }
         } catch (error) {
           console.error('Failed to complete onboarding:', error)

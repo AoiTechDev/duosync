@@ -17,13 +17,13 @@ export function AuthButtons() {
 		return (
 			<div className="flex flex-col gap-3">
 				<Button onClick={() => signIn("google", {
-					callbackUrl: "/dashboard",
+					callbackUrl: "/feed",
 				})} variant="default" className="w-full gap-2">
 					<FcGoogle className="text-xl" />
 					Sign in with Google
 				</Button>
 				<Button onClick={() => signIn("discord", {
-					callbackUrl: "/dashboard",
+					callbackUrl: "/feed",
 				})} variant="secondary" className="w-full gap-2">
 					<SiDiscord className="text-xl" />
 					Sign in with Discord

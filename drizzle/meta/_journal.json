@@ -29,6 +29,13 @@
       "when": 1756241495437,
       "tag": "0003_mute_stone_men",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1756938222255,
+      "tag": "0004_swift_sersi",
+      "breakpoints": true
     }
   ]
 }
