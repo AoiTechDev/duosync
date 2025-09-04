@@ -1,9 +1,10 @@
 import { getCurrentUser } from "@/auth";
 import { redirect } from "next/navigation";
 import { isProfileComplete } from "@/auth/utils";
-import CreateFeedPost from "@/features/create-feed-post/CreateFeedPost";
+import CreatePost from "@/features/create-post/CreatePost";
+import PostsList from "@/features/post-list/Posts";
 
-export default async function FeedPage() {
+export default async function PostPage() {
   const user = await getCurrentUser();
 
   // If no user, middleware should have redirected to login
@@ -20,7 +21,8 @@ export default async function FeedPage() {
   // Profile is complete, render dashboard
   return (
     <div className="container mx-auto py-8 max-w-3xl">
-      <CreateFeedPost user={user} />
+      <CreatePost user={user} />
+      <PostsList />
     </div>
   );
 }

@@ -1,16 +1,17 @@
 "use client";
 import { useState, useActionState, useEffect } from "react";
-import { Textarea } from "@/components/ui/textarea";
+
 import SelectRole from "./SelectRole";
 import SelectRegion from "./SelectRegion";
 import SelectRank from "./SelectRank";
-import { createFeedPost } from "@/app/(dashboard)/feed/actions";
+import { createPost } from "@/app/(dashboard)/posts/actions";
 import { User } from "@/db/schema";
-import { CreatePostFormData } from "@/types/create-feed-post";
+import { CreatePostFormData } from "@/types/create-post-type";
 import SubmitButton from "./SubmitButton";
 import { FormErrorProvider } from "@/context/FormErrorContext";
 import Description from "./Description";
-
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 const Form = ({
   user,
   setShouldOpenDialog,
@@ -24,14 +25,17 @@ const Form = ({
     region: user.region,
     rank: null,
   });
-
-  const [state, formAction] = useActionState(createFeedPost, undefined);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [state, formAction] = useActionState(createPost, undefined);
 
   useEffect(() => {
     if (state?.success) {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
       setShouldOpenDialog(false);
+      router.push("/posts");
     }
-  }, [state?.success]);
+  }, [state?.success, queryClient, setShouldOpenDialog, router]);
 
   return (
     <FormErrorProvider errors={state?.errors}>
@@ -79,7 +83,7 @@ const Form = ({
 
         <SubmitButton />
         {state?.errors && (
-          <p className="text-red-500">{state.errors.database[0]}</p>
+          <p className="text-red-500">{state.errors.database}</p>
         )}
       </form>
     </FormErrorProvider>

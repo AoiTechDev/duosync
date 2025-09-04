@@ -7,7 +7,6 @@ import { SelectValue } from "@/components/ui/select";
 import { SelectContent } from "@/components/ui/select";
 import { SelectItem } from "@/components/ui/select";
 import { Region } from "@/db/schema";
-import { useFormStore } from "@/store/create-feed-post-store";
 import { useFieldError } from "@/context/FormErrorContext";
 const regions = [
   { value: "NA1", label: "North America", flag: "🇺🇸" },

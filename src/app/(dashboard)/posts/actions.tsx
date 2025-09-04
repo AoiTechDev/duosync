@@ -3,11 +3,11 @@
 import { getCurrentUser } from "@/auth/server";
 import { posts } from "@/db/schema";
 import { db } from "@/lib/db";
-import { createFeedPostValidator } from "@/validators/create-feed-post";
+import { createPostValidator } from "@/validators/create-post-validator";
 import { revalidatePath } from "next/cache";
 
-export async function createFeedPost(prevState: any, formData: FormData) {
-  const validatedFields = createFeedPostValidator.safeParse({
+export async function createPost(prevState: any, formData: FormData) {
+  const validatedFields = createPostValidator.safeParse({
     description: formData.get("description"),
     role: JSON.parse((formData.get("role") as string) || "null"),
     region: formData.get("region"),
@@ -40,9 +40,8 @@ export async function createFeedPost(prevState: any, formData: FormData) {
       region: validatedFields.data.region,
     });
 
-    return {
-      success: true,
-    };
+    revalidatePath("/posts");
+    return { success: true };
   } catch (error) {
     console.error(error);
     return {

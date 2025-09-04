@@ -9,7 +9,7 @@ import Form from "./components/Form";
 import { User } from "@/db/schema";
 import { useState } from "react";
 
-const CreateFeedPost = ({ user }: { user: User }) => {
+const CreatePost = ({ user }: { user: User }) => {
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
   return (
     <div className="bg-card rounded-lg p-4">
@@ -24,4 +24,4 @@ const CreateFeedPost = ({ user }: { user: User }) => {
   );
 };
 
-export default CreateFeedPost;
+export default CreatePost;

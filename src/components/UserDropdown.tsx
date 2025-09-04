@@ -71,7 +71,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
           <Link href="/profile/edit">Edit Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/feed">Feeds</Link>
+          <Link href="/posts">Posts</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

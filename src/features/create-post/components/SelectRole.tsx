@@ -1,7 +1,7 @@
 "use client";
 import { ROLES } from "@/data/preferences";
 import { TagButton } from "@/components/common/TagButton";
-import type { Role } from "@/types/create-feed-post";
+import type { Role } from "@/types/create-post-type";
 import { useFieldError } from "@/context/FormErrorContext";
 
 const SelectRole = ({

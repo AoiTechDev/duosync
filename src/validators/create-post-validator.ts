@@ -21,7 +21,7 @@ const RoleEnum = z.object({
   name: z.string(),
 }, { message: "Role is required" });
 
-export const createFeedPostValidator = z.object({
+export const createPostValidator = z.object({
   description: z.string().min(1, "Description is required"),
   role: RoleEnum,
   region: RegionEnum,

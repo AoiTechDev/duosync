@@ -7,8 +7,8 @@ import { SelectValue } from "@/components/ui/select";
 import { SelectContent } from "@/components/ui/select";
 import { SelectItem } from "@/components/ui/select";
 import Image from "next/image";
-import { Rank } from "@/types/create-feed-post";
-import { useFormStore } from "@/store/create-feed-post-store";
+import { Rank } from "@/types/create-post-type";
+import { useFormStore } from "@/store/create-post-store";
 import { useFieldError } from "@/context/FormErrorContext";
 const ranks = [
   { value: "IRON", label: "Iron", image: "/ranks/IRON.png" },
