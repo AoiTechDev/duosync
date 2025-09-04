@@ -52,7 +52,7 @@ const Form = ({
         <SelectRole
           role={customFormData.role}
           onChange={(role) =>
-            setCustomFormData({ ...customFormData, role: role })
+            setCustomFormData({ ...customFormData, role })
           }
         />
         <SelectRegion
@@ -72,7 +72,7 @@ const Form = ({
         <input
           type="hidden"
           name="role"
-          value={JSON.stringify(customFormData.role)}
+          value={customFormData.role || ""}
         />
         <input
           type="hidden"

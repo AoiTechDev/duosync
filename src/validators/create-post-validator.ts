@@ -1,4 +1,5 @@
 import { regions } from "@/data/constants";
+import { roleEnum } from "@/db/schema";
 import { z } from "zod";
 
 const RankEnum = z.enum([
@@ -16,10 +17,7 @@ const RankEnum = z.enum([
 
 const RegionEnum = z.enum(regions, { message: "Region is required" });
 
-const RoleEnum = z.object({
-  id: z.enum(["top", "jungle", "mid", "adc", "support"], { message: "Role is required" }),
-  name: z.string(),
-}, { message: "Role is required" });
+const RoleEnum = z.enum(roleEnum.enumValues, { message: "Role is required" });
 
 export const createPostValidator = z.object({
   description: z.string().min(1, "Description is required"),

@@ -1,11 +1,21 @@
+import { RankMin as DbRank } from "@/db/schema";
+import { Role as DbRole } from "@/db/schema";
+
 export interface RoleOption {
-  id: string;
+  id: DbRole;
   name: string;
   icon: string;
   description: string;
   color: string;
 }
 
+export interface RankOption {
+  id: DbRank;
+  name: string;
+  icon: string;
+  description: string;
+  color: string;
+}
 export interface PlaystyleTag {
   id: string;
   name: string;
@@ -29,39 +39,46 @@ export interface CommunicationPreference {
 // Role Preferences Data
 export const ROLES: RoleOption[] = [
   {
-    id: "top",
+    id: "TOP",
     name: "Top Lane",
     icon: "/lane-icons/top-icon.png",
     description: "Tanky bruisers and split pushers",
     color: "from-amber-500 to-orange-500",
   },
   {
-    id: "jungle",
+    id: "JUNGLE",
     name: "Jungle",
     icon: "/lane-icons/jungle-icon.png",
     description: "Map control and objective focus",
     color: "from-green-500 to-emerald-500",
   },
   {
-    id: "mid",
+    id: "MID",
     name: "Mid Lane",
     icon: "/lane-icons/mid-icon.png",
     description: "High damage carries and roamers",
     color: "from-blue-500 to-purple-500",
   },
   {
-    id: "adc",
+    id: "ADC",
     name: "ADC",
     icon: "/lane-icons/adc-icon.png",
     description: "Ranged damage dealers",
     color: "from-red-500 to-pink-500",
   },
   {
-    id: "support",
+    id: "SUPPORT",
     name: "Support",
     icon: "/lane-icons/supp-icon.png",
     description: "Team enablers and protectors",
     color: "from-cyan-500 to-blue-500",
+  },
+  {
+    id: "FILL",
+    name: "Fill",
+    icon: "/lane-icons/top-icon.png", // You might want to create a fill-specific icon
+    description: "Flexible with any role",
+    color: "from-gray-500 to-slate-500",
   },
 ];
 
@@ -264,3 +281,77 @@ export const PREFERENCES_VALIDATION = {
     message: "Please select at least one social preference",
   },
 };
+
+export const RANKS: RankOption[] = [
+  {
+    id: "IRON",
+    name: "Iron",
+    icon: "/ranks/IRON.png",
+    description: "The lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "BRONZE",
+    name: "Bronze",
+    icon: "/ranks/BRONZE.png",
+    description: "The second lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "SILVER",
+    name: "Silver",
+    icon: "/ranks/SILVER.png",
+    description: "The third lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "GOLD",
+    name: "Gold",
+    icon: "/ranks/GOLD.png",
+    description: "The fourth lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "PLATINUM",
+    name: "Platinum",
+    icon: "/ranks/PLATINUM.png",
+    description: "The fifth lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "EMERALD",
+    name: "Emerald",
+    icon: "/ranks/EMERALD.png",
+    description: "The sixth lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "DIAMOND",
+    name: "Diamond",
+    icon: "/ranks/DIAMOND.png",
+    description: "The seventh lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "MASTER",
+    name: "Master",
+    icon: "/ranks/MASTER.png",
+    description: "The eighth lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "GRANDMASTER",
+    name: "Grandmaster",
+    icon: "/ranks/GRANDMASTER.png",
+    description: "The ninth lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+  {
+    id: "CHALLENGER",
+    name: "Challenger",
+    icon: "/ranks/CHALLANGER.png",
+    description: "The tenth lowest rank",
+    color: "from-gray-500 to-slate-500",
+  },
+];
+

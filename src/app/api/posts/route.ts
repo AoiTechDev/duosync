@@ -16,6 +16,7 @@ export async function GET() {
         updatedAt: posts.updatedAt,
         rank: posts.rank,
         region: posts.region,
+        role: posts.role,
         authorId: posts.authorId,
         // Author fields
         author: {

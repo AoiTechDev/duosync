@@ -9,7 +9,7 @@ const SelectRole = ({
   onChange,
 }: {
   role: Role | null;
-  onChange: ({ id, name }: Role) => void;
+  onChange: (role: Role) => void;
 }) => {
   const error = useFieldError("role");
 
@@ -25,8 +25,8 @@ const SelectRole = ({
         {ROLES.map((r) => (
           <TagButton
             key={r.id}
-            selected={r.id === role?.id}
-            onClick={() => onChange({ id: r.id, name: r.name })}
+            selected={r.id === role}
+            onClick={() => onChange(r.id)}
             icon={r.icon}
             label={r.name}
           />

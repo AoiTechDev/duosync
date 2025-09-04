@@ -23,6 +23,8 @@ export const roleEnum = pgEnum("role", [
   "FILL",
 ]);
 
+export type Role = (typeof roleEnum.enumValues)[number];
+
 export const rankEnum = pgEnum("rank", [
   "IRON_I",
   "IRON_II",
@@ -69,7 +71,7 @@ export const rankMinEnum = pgEnum("rank_min", [
   "GRANDMASTER",
   "CHALLENGER",
 ]);
-
+export type RankMin = (typeof rankMinEnum.enumValues)[number];
 export const regionEnum = pgEnum("region", regions as [string, ...string[]]);
 export type Region = (typeof regionEnum.enumValues)[number];
 
@@ -169,6 +171,7 @@ export const posts = pgTable("posts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   rank: rankMinEnum("rank_min").notNull(),
   region: regionEnum("region").notNull(),
+  role: roleEnum("role").notNull(),
   authorId: uuid("author_id")
     .references(() => users.id)
     .notNull(),

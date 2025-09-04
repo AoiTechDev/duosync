@@ -28,6 +28,7 @@ export type PostWithAuthor = {
   createdAt: Date;
   updatedAt: Date;
   rank: string;
+  role: string;
   region: string;
   authorId: string;
   author: {

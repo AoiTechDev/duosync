@@ -6,10 +6,15 @@ import { db } from "@/lib/db";
 import { createPostValidator } from "@/validators/create-post-validator";
 import { revalidatePath } from "next/cache";
 
-export async function createPost(prevState: any, formData: FormData) {
+interface CreatePostState {
+  errors?: Record<string, string[]>;
+  success?: boolean;
+}
+
+export async function createPost(prevState: CreatePostState | undefined, formData: FormData): Promise<CreatePostState> {
   const validatedFields = createPostValidator.safeParse({
     description: formData.get("description"),
-    role: JSON.parse((formData.get("role") as string) || "null"),
+    role: formData.get("role"),
     region: formData.get("region"),
     rank: formData.get("rank"),
   });
@@ -38,6 +43,7 @@ export async function createPost(prevState: any, formData: FormData) {
       authorId: user.id,
       rank: validatedFields.data.rank,
       region: validatedFields.data.region,
+      role: validatedFields.data.role,
     });
 
     revalidatePath("/posts");

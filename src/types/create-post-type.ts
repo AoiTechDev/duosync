@@ -1,5 +1,6 @@
-import { RoleOption } from "@/data/preferences";
-import { Region } from "@/db/schema";
+import { Region, Role } from "@/db/schema";
+
+export type { Role };
 
 export type Rank =
   | "IRON"
@@ -12,8 +13,6 @@ export type Rank =
   | "MASTER"
   | "GRANDMASTER"
   | "CHALLENGER";
-
-export type Role = Pick<RoleOption, "id" | "name">;
 
 export type CreatePostFormData = {
   description: string | null;
