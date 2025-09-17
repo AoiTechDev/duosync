@@ -8,7 +8,6 @@ import { SelectContent } from "@/components/ui/select";
 import { SelectItem } from "@/components/ui/select";
 import Image from "next/image";
 import { Rank } from "@/types/create-post-type";
-import { useFormStore } from "@/store/create-post-store";
 import { useFieldError } from "@/context/FormErrorContext";
 const ranks = [
   { value: "IRON", label: "Iron", image: "/ranks/IRON.png" },
@@ -35,6 +34,7 @@ const SelectRank = ({
   onChange: (rank: Rank) => void;
 }) => {
   const error = useFieldError("rank");
+  
   return (
     <div className="space-y-2">
       <Label
@@ -44,7 +44,7 @@ const SelectRank = ({
         What rank you are looking for?
       </Label>
       <Select
-        value={rank || undefined}
+        value={rank ?? ""}
         onValueChange={(value) => onChange(value as Rank)}
       >
         <SelectTrigger className="h-12 text-base">

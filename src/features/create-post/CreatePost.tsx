@@ -7,14 +7,14 @@ import {
 } from "@/components/ui/dialog";
 import Form from "./components/Form";
 import { User } from "@/db/schema";
-import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFormStore } from "@/store/create-post-store";
 
 const CreatePost = ({ user }: { user: User }) => {
-  const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
+  const { shouldOpenCreateDialog, setShouldOpenCreateDialog } = useFormStore();
   return (
-    <Dialog open={shouldOpenDialog} onOpenChange={setShouldOpenDialog}>
+    <Dialog open={shouldOpenCreateDialog} onOpenChange={setShouldOpenCreateDialog}>
       <DialogTrigger asChild>
         <Card className="mb-8 cursor-pointer group hover:scale-[1.02] max-w-2xl mx-auto transition-all duration-300 border-2 border-dashed border-primary/30 hover:border-primary/60 bg-gradient-to-r from-card/50 to-card/80 backdrop-blur-sm">
           <CardContent className="p-6">
@@ -42,7 +42,7 @@ const CreatePost = ({ user }: { user: User }) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogTitle>Create your post</DialogTitle>
-        <Form user={user as User} setShouldOpenDialog={setShouldOpenDialog} />
+        <Form user={user as User} />
       </DialogContent>
     </Dialog>
   );

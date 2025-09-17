@@ -1,30 +1,20 @@
-import { PostWithAuthor } from "@/lib/db";
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardAction,
-} from "@/components/ui/card";
+import { PostWithAuthor, User } from "@/lib/db";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Clock,
-  Star,
-  Target,
-  Trophy,
-  MapPin,
-  Heart,
-  MessageCircle,
-  UserPlus,
-} from "lucide-react";
+import { Clock, EllipsisVertical } from "lucide-react";
 import { RANKS, ROLES } from "@/data/preferences";
 import Image from "next/image";
 import { regionsWithFlags } from "@/data/constants";
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { useFormStore } from "@/store/create-post-store";
 
-const Post = ({ post }: { post: PostWithAuthor }) => {
+const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
   const formatRelativeTime = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - new Date(date).getTime();
@@ -37,59 +27,10 @@ const Post = ({ post }: { post: PostWithAuthor }) => {
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
   };
-  const formatRank = (rank: string) => {
-    return rank.replace("_", " ");
-  };
 
-  const getRankColor = (rank: string) => {
-    const baseRank = rank.split("_")[0];
-    switch (baseRank) {
-      case "IRON":
-        return "bg-slate-600 text-white";
-      case "BRONZE":
-        return "bg-amber-600 text-white";
-      case "SILVER":
-        return "bg-slate-400 text-white";
-      case "GOLD":
-        return "bg-yellow-500 text-white";
-      case "PLATINUM":
-        return "bg-teal-500 text-white";
-      case "EMERALD":
-        return "bg-emerald-500 text-white";
-      case "DIAMOND":
-        return "bg-blue-500 text-white";
-      case "MASTER":
-        return "bg-purple-600 text-white";
-      case "GRANDMASTER":
-        return "bg-red-600 text-white";
-      case "CHALLENGER":
-        return "bg-orange-500 text-white";
-      default:
-        return "bg-gray-500 text-white";
-    }
-  };
+  const isOwner = user?.id === post.author.id;
 
-  const getRegionFlag = (region: string) => {
-    switch (region) {
-      case "NA1":
-        return "🇺🇸";
-      case "EUW1":
-        return "🇪🇺";
-      case "EUN1":
-        return "🇪🇺";
-      case "KR":
-        return "🇰🇷";
-      case "BR1":
-        return "🇧🇷";
-      case "LA1":
-      case "LA2":
-        return "🌎";
-      default:
-        return "🌍";
-    }
-  };
-
-  console.log(post);
+  const { setPostId, setShouldOpenEditDialog } = useFormStore();
   return (
     <Card
       key={post.id}
@@ -108,10 +49,10 @@ const Post = ({ post }: { post: PostWithAuthor }) => {
               </AvatarFallback>
             </Avatar>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <div className="flex items-center gap-3 mb-2">
               <h3 className="font-bold text-lg text-foreground ">
-                {post.author.name}
+                {post.author.username}
               </h3>
               <Badge
                 className={` text-white text-xs px-3 py-1 font-semibold shadow-md`}
@@ -133,9 +74,31 @@ const Post = ({ post }: { post: PostWithAuthor }) => {
                 {formatRelativeTime(post.createdAt)}
               </div>
             </div>
+
+            {isOwner && (
+              <div className="absolute top-0 right-0">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="cursor-pointer">
+                    <EllipsisVertical className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setPostId(post.id);
+                        setShouldOpenEditDialog(true);
+                      }}
+                    >
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>
+
       <CardContent className="pt-0 space-y-4">
         <p className="text-foreground leading-relaxed text-base font-medium">
           {post.description}
@@ -179,17 +142,8 @@ const Post = ({ post }: { post: PostWithAuthor }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            {/* <div className="flex items-center gap-1">
-              <Heart className="h-4 w-4" />
-              <span>{post.author.likes}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <MessageCircle className="h-4 w-4" />
-              <span>{post.comments}</span>
-            </div> */}
-          </div>
+        {/* <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground"></div>
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -207,7 +161,7 @@ const Post = ({ post }: { post: PostWithAuthor }) => {
               Message
             </Button>
           </div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

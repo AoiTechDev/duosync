@@ -7,7 +7,6 @@ export async function GET() {
   try {
     const postsResponse = await db
       .select({
-        // Post fields
         id: posts.id,
         description: posts.description,
         isActive: posts.isActive,
@@ -18,7 +17,6 @@ export async function GET() {
         region: posts.region,
         role: posts.role,
         authorId: posts.authorId,
-        // Author fields
         author: {
           id: users.id,
           username: users.username,
@@ -36,7 +34,7 @@ export async function GET() {
       .innerJoin(users, eq(posts.authorId, users.id))
       .where(eq(posts.isActive, true))
       .orderBy(desc(posts.createdAt));
-    
+
     return NextResponse.json(postsResponse);
   } catch (error) {
     console.error(error);

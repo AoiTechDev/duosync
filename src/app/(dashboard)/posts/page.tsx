@@ -7,22 +7,19 @@ import PostsList from "@/features/post-list/Posts";
 export default async function PostPage() {
   const user = await getCurrentUser();
 
-  // If no user, middleware should have redirected to login
-  // But let's be safe
+
   if (!user) {
     redirect("/login");
   }
 
-  // Check if profile is complete
   if (!isProfileComplete(user)) {
     redirect("/onboarding");
   }
 
-  // Profile is complete, render dashboard
   return (
     <div className="container mx-auto py-8 max-w-3xl">
       <CreatePost user={user} />
-      <PostsList />
+      <PostsList user={user}/>
     </div>
   );
 }

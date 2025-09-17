@@ -40,7 +40,7 @@ const SelectRegion = ({
         Region
       </Label>
       <Select
-        value={region || undefined}
+        value={region ?? ""}
         onValueChange={(value) => onChange(value as Region)}
       >
         <SelectTrigger className="h-12 text-base">

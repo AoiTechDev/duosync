@@ -1,24 +1,19 @@
 "use client";
 import { useState, useActionState, useEffect } from "react";
 
-import SelectRole from "./SelectRole";
-import SelectRegion from "./SelectRegion";
-import SelectRank from "./SelectRank";
+import SelectRole from "@/features/common/SelectRole";
+import SelectRegion from "@/features/common/SelectRegion";
+import SelectRank from "@/features/common/SelectRank";
 import { createPost } from "@/app/(dashboard)/posts/actions";
 import { User } from "@/db/schema";
 import { CreatePostFormData } from "@/types/create-post-type";
-import SubmitButton from "./SubmitButton";
+import SubmitButton from "@/features/common/SubmitButton";
 import { FormErrorProvider } from "@/context/FormErrorContext";
-import Description from "./Description";
+import Description from "@/features/common/Description";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-const Form = ({
-  user,
-  setShouldOpenDialog,
-}: {
-  user: User;
-  setShouldOpenDialog: (shouldOpenDialog: boolean) => void;
-}) => {
+import { useFormStore } from "@/store/create-post-store";
+const Form = ({ user }: { user: User }) => {
   const [customFormData, setCustomFormData] = useState<CreatePostFormData>({
     description: null,
     role: null,
@@ -28,14 +23,17 @@ const Form = ({
   const router = useRouter();
   const queryClient = useQueryClient();
   const [state, formAction] = useActionState(createPost, undefined);
-
+  const { setShouldOpenCreateDialog } = useFormStore();
+  
   useEffect(() => {
     if (state?.success) {
+      // Close dialog first to prevent UI flicker
+      setShouldOpenCreateDialog(false);
+      // Then invalidate queries to refresh the posts list
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      setShouldOpenDialog(false);
-      router.push("/posts");
+      // router.push("/posts");
     }
-  }, [state?.success, queryClient, setShouldOpenDialog, router]);
+  }, [state?.success, queryClient, setShouldOpenCreateDialog, router]);
 
   return (
     <FormErrorProvider errors={state?.errors}>
@@ -51,9 +49,7 @@ const Form = ({
         />
         <SelectRole
           role={customFormData.role}
-          onChange={(role) =>
-            setCustomFormData({ ...customFormData, role })
-          }
+          onChange={(role) => setCustomFormData({ ...customFormData, role })}
         />
         <SelectRegion
           region={customFormData.region}
@@ -68,12 +64,7 @@ const Form = ({
           }
         />
 
-        {/* Hidden inputs to capture form data */}
-        <input
-          type="hidden"
-          name="role"
-          value={customFormData.role || ""}
-        />
+        <input type="hidden" name="role" value={customFormData.role || ""} />
         <input
           type="hidden"
           name="region"
