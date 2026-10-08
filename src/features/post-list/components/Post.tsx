@@ -1,8 +1,10 @@
+"use client";
+
 import { PostWithAuthor, User } from "@/lib/db";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, EllipsisVertical } from "lucide-react";
+import { Clock, EllipsisVertical, UserPlus } from "lucide-react";
 import { RANKS, ROLES } from "@/data/preferences";
 import Image from "next/image";
 import { regionsWithFlags } from "@/data/constants";
@@ -13,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { useFormStore } from "@/store/create-post-store";
+import { Button } from "@/components/ui/button";
+import { sendFriendRequest } from "@/features/friends/api";
 
 const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
   const formatRelativeTime = (date: Date) => {
@@ -142,26 +146,36 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
           </div>
         </div>
 
-        {/* <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground"></div>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-            >
-              <UserPlus className="h-4 w-4 mr-1" />
-              Send Request
-            </Button>
-            <Button
+        {!isOwner && (
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground"></div>
+
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                onClick={async () => {
+                  try {
+                    const result = await sendFriendRequest(post.author.id);
+
+                    console.log(result);
+                  } catch {}
+                }}
+              >
+                <UserPlus className="h-4 w-4 mr-1" />
+                Send Request
+              </Button>
+              {/* <Button
               size="sm"
               variant="outline"
               className="bg-background/50 border-border/50 hover:bg-card hover:border-primary/50 transition-all duration-300"
             >
               <MessageCircle className="h-4 w-4 mr-1" />
               Message
-            </Button>
+            </Button> */}
+            </div>
           </div>
-        </div> */}
+        )}
       </CardContent>
     </Card>
   );

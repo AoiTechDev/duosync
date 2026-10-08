@@ -43,6 +43,13 @@
       "when": 1757012111676,
       "tag": "0005_nostalgic_sandman",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1758321619626,
+      "tag": "0006_wealthy_night_thrasher",
+      "breakpoints": true
     }
   ]
 }

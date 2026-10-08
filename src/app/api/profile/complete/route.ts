@@ -21,16 +21,28 @@ export async function POST(request: NextRequest) {
       .update(users)
       .set({
         username: profileData.username?.toLowerCase(),
-        region: profileData.region,
-        summonerName: profileData.summonerName,
+        region: profileData.region || null,
+        summonerName: profileData.summonerName || null,
         // Handle null/undefined ranks (unranked players)
-        soloRank: profileData.soloRank === "UNRANKED" || !profileData.soloRank ? null : profileData.soloRank,
-        flexRank: profileData.flexRank === "UNRANKED" || !profileData.flexRank ? null : profileData.flexRank,
-        mainRole: profileData.mainRole?.toUpperCase(),
-        secondaryRole: profileData.secondaryRole?.toUpperCase(),
-        playstyle: profileData.playstyleTags || [],
-        communication: profileData.communication || [],
-        goals: profileData.goals || [],
+        soloRank:
+          profileData.soloRank === "UNRANKED" || !profileData.soloRank
+            ? null
+            : profileData.soloRank,
+        flexRank:
+          profileData.flexRank === "UNRANKED" || !profileData.flexRank
+            ? null
+            : profileData.flexRank,
+        mainRole: profileData.mainRole ? profileData.mainRole.toUpperCase() : null,
+        secondaryRole: profileData.secondaryRole
+          ? profileData.secondaryRole.toUpperCase()
+          : null,
+        playstyle: Array.isArray(profileData.playstyleTags)
+          ? profileData.playstyleTags
+          : [],
+        communication: Array.isArray(profileData.communication)
+          ? profileData.communication
+          : [],
+        goals: Array.isArray(profileData.goals) ? profileData.goals : [],
         bio: profileData.bio || "",
         updatedAt: new Date(),
       })

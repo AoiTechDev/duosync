@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCurrentUser } from "@/auth";
 import { ServerUserDropdown } from "./ServerUserDropdown";
+import FriendsDropdown from "./FriendsDropdown";
 
 export default async function Navbar() {
   const user = await getCurrentUser();
@@ -21,6 +22,7 @@ export default async function Navbar() {
 
         {/* User Section */}
         <div className="flex items-center gap-3">
+          <FriendsDropdown/>
           {user ? (
             <ServerUserDropdown user={user} />
           ) : (

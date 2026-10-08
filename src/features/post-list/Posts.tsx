@@ -7,10 +7,13 @@ import { AlertCircle, RefreshCw, Wifi } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import PostSkeleton from "@/components/PostSkeleton";
 import { useFormStore } from "@/store/create-post-store";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import EditForm from "./components/EditForm";
-
-
 
 const PostsError = ({
   error,
@@ -109,23 +112,21 @@ const Posts = ({ user }: { user: User }) => {
     gcTime: 10 * 60 * 1000,
   });
 
-  
+  const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } =
+    useFormStore();
+
   if (isLoading) {
     return <PostSkeleton />;
   }
 
-  
   if (isError && error) {
     return (
       <PostsError error={error} refetch={refetch} isRefetching={isFetching} />
     );
   }
 
-  const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } = useFormStore();
-
   return (
     <div className="space-y-4">
-      
       {isFetching && (
         <div className="flex items-center justify-center py-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
@@ -140,7 +141,10 @@ const Posts = ({ user }: { user: User }) => {
           {data.map((post: PostWithAuthor) => (
             <Post key={post.id} post={post} user={user} />
           ))}
-          <Dialog open={shouldOpenEditDialog} onOpenChange={setShouldOpenEditDialog}>
+          <Dialog
+            open={shouldOpenEditDialog}
+            onOpenChange={setShouldOpenEditDialog}
+          >
             <DialogContent className="sm:max-w-2xl">
               <DialogTitle>Edit your post</DialogTitle>
               <DialogDescription>

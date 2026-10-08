@@ -22,10 +22,10 @@ export function OnboardingProgress() {
       </div>
       
       <div className="flex items-center justify-between relative">
-        {/* Progress Line Background */}
+        
         <div className="absolute top-6 left-6 right-6 h-0.5 bg-border -z-10" />
         
-        {/* Active Progress Line */}
+        
         <div 
           className="absolute top-6 left-6 h-0.5 bg-primary transition-all duration-700 ease-out -z-10"
           style={{ 

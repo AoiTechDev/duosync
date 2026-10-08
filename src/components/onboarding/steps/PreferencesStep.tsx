@@ -81,7 +81,7 @@ export default function PreferencesStep() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Game Preferences</h2>
         <p className="text-gray-600">
@@ -89,7 +89,7 @@ export default function PreferencesStep() {
         </p>
       </div>
 
-      {/* Errors */}
+      
       {errors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start gap-2">
@@ -108,7 +108,7 @@ export default function PreferencesStep() {
         </div>
       )}
 
-      {/* Primary Role - Required */}
+      
       <div className="space-y-3">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           Primary Role
@@ -129,7 +129,7 @@ export default function PreferencesStep() {
         </div>
       </div>
 
-      {/* Goals - Required */}
+      
       <div className="space-y-3">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           Goals
@@ -149,7 +149,7 @@ export default function PreferencesStep() {
         </div>
       </div>
 
-      {/* Communication - Required */}
+      
       <div className="space-y-3">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           Communication
@@ -169,7 +169,7 @@ export default function PreferencesStep() {
         </div>
       </div>
 
-      {/* Secondary Role - Optional */}
+      
       <div className="space-y-3">
         <h3 className="text-lg font-semibold">Secondary Role</h3>
         <div className="flex flex-wrap gap-2">
@@ -192,7 +192,7 @@ export default function PreferencesStep() {
         </div>
       </div>
 
-      {/* Playstyle Tags - Optional */}
+      
       <div className="space-y-3">
         <h3 className="text-lg font-semibold">
           Playstyle Tags
@@ -223,7 +223,7 @@ export default function PreferencesStep() {
         </div>
       </div>
 
-      {/* Navigation */}
+      
       <div className="flex justify-between pt-6 border-t">
         <Button variant="outline" onClick={prevStep} className="px-6">
           Back

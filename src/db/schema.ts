@@ -9,6 +9,7 @@ import {
   integer,
   unique,
   primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import type { AdapterAccount } from "next-auth/adapters";
@@ -85,7 +86,8 @@ export const gameModeEnum = pgEnum("game_mode", [
 export const friendshipStatusEnum = pgEnum("friendship_status", [
   "PENDING",
   "ACCEPTED",
-  "BLOCKED",
+  "DECLINED",
+  "CANCELED",
 ]);
 
 // NextAuth adapter tables
@@ -181,9 +183,28 @@ export const friendships = pgTable(
   "friendships",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    userAId: uuid("user_a_id")
+      .references(() => users.id)
+      .notNull(),
+    userBId: uuid("user_b_id")
+      .references(() => users.id)
+      .notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    uniqueFriendship: unique().on(table.userAId, table.userBId),
+    userAIdx: index().on(table.userAId),
+    userBIdx: index().on(table.userBId),
+  })
+);
+
+export const friendRequests = pgTable(
+  "friend_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
     status: friendshipStatusEnum("status").default("PENDING").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-
     senderId: uuid("sender_id")
       .references(() => users.id)
       .notNull(),
@@ -192,37 +213,8 @@ export const friendships = pgTable(
       .notNull(),
   },
   (table) => ({
-    uniqueFriendship: unique().on(table.senderId, table.receiverId),
-  })
-);
-
-export const messages = pgTable("messages", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  isRead: boolean("is_read").default(false).notNull(),
-
-  senderId: uuid("sender_id")
-    .references(() => users.id)
-    .notNull(),
-  receiverId: uuid("receiver_id")
-    .references(() => users.id)
-    .notNull(),
-});
-
-export const likes = pgTable(
-  "likes",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: uuid("user_id")
-      .references(() => users.id)
-      .notNull(),
-    postId: uuid("post_id")
-      .references(() => posts.id)
-      .notNull(),
-  },
-  (table) => ({
-    uniqueLike: unique().on(table.userId, table.postId),
+    inboundIdx: index().on(table.receiverId, table.status),
+    outboundIdx: index().on(table.senderId, table.status),
   })
 );
 
@@ -231,13 +223,11 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
   posts: many(posts),
-  sentMessages: many(messages, { relationName: "messageSender" }),
-  receivedMessages: many(messages, { relationName: "messageReceiver" }),
+
   sentFriendships: many(friendships, { relationName: "friendshipSender" }),
   receivedFriendships: many(friendships, {
     relationName: "friendshipReceiver",
   }),
-  likes: many(likes),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -252,43 +242,5 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, {
     fields: [posts.authorId],
     references: [users.id],
-  }),
-  likes: many(likes),
-}));
-
-export const friendshipsRelations = relations(friendships, ({ one }) => ({
-  sender: one(users, {
-    fields: [friendships.senderId],
-    references: [users.id],
-    relationName: "friendshipSender",
-  }),
-  receiver: one(users, {
-    fields: [friendships.receiverId],
-    references: [users.id],
-    relationName: "friendshipReceiver",
-  }),
-}));
-
-export const messagesRelations = relations(messages, ({ one }) => ({
-  sender: one(users, {
-    fields: [messages.senderId],
-    references: [users.id],
-    relationName: "messageSender",
-  }),
-  receiver: one(users, {
-    fields: [messages.receiverId],
-    references: [users.id],
-    relationName: "messageReceiver",
-  }),
-}));
-
-export const likesRelations = relations(likes, ({ one }) => ({
-  user: one(users, {
-    fields: [likes.userId],
-    references: [users.id],
-  }),
-  post: one(posts, {
-    fields: [likes.postId],
-    references: [posts.id],
   }),
 }));
