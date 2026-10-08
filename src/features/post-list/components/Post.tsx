@@ -17,24 +17,15 @@ import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { useFormStore } from "@/store/create-post-store";
 import { Button } from "@/components/ui/button";
 import { sendFriendRequest } from "@/features/friends/api";
+import { formatRelativeTime, stripRankName } from "@/lib/utils";
 
 const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
-  const formatRelativeTime = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (minutes < 1) return "just now";
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
-  };
 
   const isOwner = user?.id === post.author.id;
 
   const { setPostId, setShouldOpenEditDialog } = useFormStore();
+
   return (
     <Card
       key={post.id}
@@ -64,12 +55,8 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
                 {post.author.mainRole}
               </Badge>
               {post.author.soloRank && (
-                <Badge
-                  variant="outline"
-                  className="text-xs font-semibold border-accent/50 text-accent"
-                >
-                  {post.author.soloRank}
-                </Badge>
+
+                <Image src={`/ranks/${stripRankName(post.author.soloRank)}.png`} width={50} height={50} alt="rank" />
               )}
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -159,7 +146,7 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
                     const result = await sendFriendRequest(post.author.id);
 
                     console.log(result);
-                  } catch {}
+                  } catch { }
                 }}
               >
                 <UserPlus className="h-4 w-4 mr-1" />

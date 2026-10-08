@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "@/db/schema";
+import { type Rank } from "@/db/schema";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not defined");
@@ -17,7 +18,7 @@ export type User = typeof schema.users.$inferSelect;
 export type NewUser = typeof schema.users.$inferInsert;
 export type Post = typeof schema.posts.$inferSelect;
 export type NewPost = typeof schema.posts.$inferInsert;
-export type Message = typeof schema.messages.$inferSelect;
+// export type Message = typeof schema.messages.$inferSelect; 
 export type Friendship = typeof schema.friendships.$inferSelect;
 
 export type PostWithAuthor = {
@@ -27,7 +28,7 @@ export type PostWithAuthor = {
   expiresAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  rank: string;
+  rank: Rank;
   role: string;
   region: string;
   authorId: string;
@@ -38,8 +39,8 @@ export type PostWithAuthor = {
     image: string | null;
     avatar: string | null;
     summonerName: string | null;
-    soloRank: string | null;
-    flexRank: string | null;
+    soloRank: Rank | null;
+    flexRank: Rank | null;
     mainRole: string | null;
     secondaryRole: string | null;
   };
