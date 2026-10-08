@@ -112,8 +112,7 @@ const Posts = ({ user }: { user: User }) => {
     gcTime: 10 * 60 * 1000,
   });
 
-  const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } =
-    useFormStore();
+  const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } = useFormStore();
 
   if (isLoading) {
     return <PostSkeleton />;

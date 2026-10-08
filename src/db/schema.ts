@@ -59,6 +59,7 @@ export const rankEnum = pgEnum("rank", [
   "GRANDMASTER",
   "CHALLENGER",
 ]);
+export type Rank = (typeof rankEnum.enumValues)[number];
 
 export const rankMinEnum = pgEnum("rank_min", [
   "IRON",

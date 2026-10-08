@@ -102,7 +102,7 @@ function RiotVerificationSection({ user }: { user: User }) {
       });
 
       const result = await response.json();
-
+     
       if (result.success) {
         setSuccess(true);
         setError("");
@@ -171,7 +171,7 @@ function RiotVerificationSection({ user }: { user: User }) {
                   setError("");
                 }}
                 placeholder="Game Name"
-                className="flex-1"
+                className="flex-1 text-black"
               />
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-gray-400">#</span>
@@ -182,7 +182,7 @@ function RiotVerificationSection({ user }: { user: User }) {
                     setError("");
                   }}
                   placeholder="TAG"
-                  className="w-24"
+                  className="w-24 text-black"
                   maxLength={5}
                 />
                 <Button
@@ -254,7 +254,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         
-        {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Profile</h1>
@@ -273,15 +272,12 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
           </div>
         </div>
 
-        {/* Riot Account Verification */}
         <RiotVerificationSection user={user} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Profile Overview */}
           <div className="lg:col-span-1 space-y-6">
             
-            {/* Basic Info Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -331,7 +327,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </CardContent>
             </Card>
 
-            {/* Rank Information */}
             {(user.soloRank || user.flexRank) && (
               <Card>
                 <CardHeader>
@@ -383,10 +378,8 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
             )}
           </div>
 
-          {/* Preferences & Settings */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Roles */}
             {(user.mainRole || user.secondaryRole) && (
               <Card>
                 <CardHeader>
@@ -414,7 +407,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </Card>
             )}
 
-            {/* Goals */}
             {user.goals && user.goals.length > 0 && (
               <Card>
                 <CardHeader>
@@ -433,7 +425,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </Card>
             )}
 
-            {/* Communication Preferences */}
             {user.communication && user.communication.length > 0 && (
               <Card>
                 <CardHeader>
@@ -452,7 +443,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </Card>
             )}
 
-            {/* Playstyle Tags */}
             {user.playstyle && user.playstyle.length > 0 && (
               <Card>
                 <CardHeader>
@@ -471,7 +461,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </Card>
             )}
 
-            {/* Bio Section */}
             {user.bio && (
               <Card>
                 <CardHeader>
@@ -486,7 +475,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </Card>
             )}
 
-            {/* Empty State for Missing Preferences */}
             {(!user.goals || user.goals.length === 0) && 
              (!user.communication || user.communication.length === 0) && 
              (!user.playstyle || user.playstyle.length === 0) && (
