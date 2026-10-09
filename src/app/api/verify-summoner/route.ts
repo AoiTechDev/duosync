@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/auth/options";
 import { db } from "@/lib/db";
 import { rankEnum, users, type Rank } from "@/db/schema";
 import { eq } from "drizzle-orm";
