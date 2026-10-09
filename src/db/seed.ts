@@ -2,7 +2,7 @@ import { db } from '@/lib/db'
 import { users, posts } from './schema'
 import { config } from 'dotenv'
 
-config({ path: '.env.local' })
+config()
 
 async function seed() {
   console.log('🌱 Seeding database...')
@@ -13,8 +13,8 @@ async function seed() {
       username: 'johndoe',
       summonerName: 'JohnTheRiftWalker',
       region: 'NA1',
-      soloRank: 'GOLD_2',
-      flexRank: 'GOLD_1',
+      soloRank: 'GOLD_II',
+      flexRank: 'GOLD_I',
       mainRole: 'ADC',
       secondaryRole: 'MID',
       bio: 'Looking for consistent duo partner to climb ranked!',
@@ -27,8 +27,8 @@ async function seed() {
       username: 'janesmith',
       summonerName: 'JaneSupreme',
       region: 'NA1',
-      soloRank: 'SILVER_1',
-      flexRank: 'SILVER_3',
+      soloRank: 'SILVER_I',
+      flexRank: 'SILVER_III',
       mainRole: 'SUPPORT',
       secondaryRole: 'JUNGLE',
       bio: 'Friendly support main, let\'s have fun and win!',
@@ -41,22 +41,18 @@ async function seed() {
   // Create sample posts
   await db.insert(posts).values([
     {
-      title: 'Gold ADC LF Support Duo',
       description: 'Looking for a consistent support player to duo with in ranked. I main ADC and am currently Gold 2. Prefer someone who uses voice chat and wants to climb!',
       authorId: sampleUsers[0].id,
-      lookingFor: ['SUPPORT'],
-      rankRange: { min: 'SILVER_1', max: 'PLATINUM_4' },
-      region: 'NA1',
-      gameMode: 'RANKED_SOLO'
+      role: 'ADC',
+      rank: 'GOLD',
+      region: 'NA1'
     },
     {
-      title: 'Silver Support Available Now',
       description: 'Support main online now and ready to play some games. Looking for chill ADC player for a few ranked games.',
       authorId: sampleUsers[1].id,
-      lookingFor: ['ADC'],
-      rankRange: { min: 'BRONZE_1', max: 'GOLD_3' },
-      region: 'NA1',
-      gameMode: 'RANKED_SOLO'
+      role: 'SUPPORT',
+      rank: 'SILVER',
+      region: 'NA1'
     }
   ])
 
