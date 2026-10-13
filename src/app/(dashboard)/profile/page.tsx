@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
-import { ProfileView } from "./ProfileView";
+import { ProfileView } from "@/features/profile/ProfileView";
 
 export const metadata: Metadata = { title: "Profile · DuoSync" };
 

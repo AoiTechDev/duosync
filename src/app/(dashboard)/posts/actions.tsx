@@ -110,7 +110,6 @@ export async function editPost(
         region: validatedFields.data.region,
         role: validatedFields.data.role,
       })
-      // Only the author may edit their post.
       .where(and(eq(posts.id, postId), eq(posts.authorId, user.id)));
 
     revalidatePath("/posts");
@@ -132,7 +131,6 @@ export async function deletePost(postId: string): Promise<{ success: boolean; er
   }
 
   try {
-    // Soft delete: hidden from the feed, kept in the database.
     const [deleted] = await db
       .update(posts)
       .set({ isActive: false, updatedAt: new Date() })

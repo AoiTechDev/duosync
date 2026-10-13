@@ -4,7 +4,6 @@ interface FormState {
   errors: Record<string, string[]> | null;
   setErrors: (errors: Record<string, string[]> | null) => void;
   getFieldError: (field: string) => string | null;
-  // Separate states for create and edit dialogs
   shouldOpenCreateDialog: boolean;
   setShouldOpenCreateDialog: (shouldOpenCreateDialog: boolean) => void;
   shouldOpenEditDialog: boolean;

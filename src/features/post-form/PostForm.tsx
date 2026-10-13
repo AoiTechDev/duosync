@@ -40,7 +40,6 @@ function Field({ label, aside, error, children }: { label: ReactNode; aside?: Re
   );
 }
 
-/** Create or edit a duo request. Rendered inside a <DialogContent>. */
 export function PostForm({
   mode,
   initial,
@@ -50,7 +49,6 @@ export function PostForm({
   mode: "create" | "edit";
   initial: PostFormValues;
   postId?: string;
-  /** Called after a successful save, e.g. to close the dialog. */
   onDone: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -224,6 +222,5 @@ export function PostForm({
   );
 }
 
-/** Shared look for the dialog that holds a PostForm. */
 export const postDialogClass =
   "max-h-[calc(100dvh-2rem)] gap-0 overflow-y-auto rounded-2xl border-border bg-card p-0 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.85),0_0_60px_-30px_var(--primary)] sm:max-w-[560px] before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-linear-to-r before:from-primary before:via-accent before:to-transparent";

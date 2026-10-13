@@ -2,11 +2,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface OnboardingData {
-  // Step 1: Basic Info
   username?: string;
   region?: string;
 
-  // Step 2: Riot Account
   summonerName?: string;
   gameName?: string;
   tagLine?: string;
@@ -14,7 +12,6 @@ interface OnboardingData {
   soloRank?: string;
   flexRank?: string;
 
-  // Step 3: Preferences
   mainRole?: string;
   secondaryRole?: string;
   playstyleTags?: string[];
@@ -27,7 +24,6 @@ interface OnboardingStore {
   data: OnboardingData;
   isCompleted: boolean;
 
-  // Actions
   setStep: (step: number) => void;
   updateData: (newData: Partial<OnboardingData>) => void;
   nextStep: () => void;
@@ -63,7 +59,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
       completeOnboarding: async () => {
         const { data } = get();
 
-        // Clean up data to remove old rank fields before sending
         const cleanedData = {
           username: data.username,
           region: data.region,
@@ -81,7 +76,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
         };
 
         try {
-          // Save to database
           const response = await fetch("/api/profile/complete", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -90,7 +84,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
           if (response.ok) {
             set({ isCompleted: true });
-            // Redirect to dashboard
             window.location.href = "/posts";
           }
         } catch (error) {
@@ -103,7 +96,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
     {
       name: "duosync-onboarding",
       migrate: (persistedState: unknown, version: number) => {
-        // Clean up old rank fields from persisted data
         if (persistedState && typeof persistedState === "object" && "data" in persistedState) {
           const state = persistedState as { data: Record<string, unknown> };
           const { currentRank, peakRank, ...cleanData } = state.data;

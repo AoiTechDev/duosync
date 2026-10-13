@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutList, Pencil, UserRound } from "lucide-react";
+import { LayoutList, Pencil, UserRound, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,6 +17,7 @@ import { SignOutButton } from "./SignOutButton";
 const ITEMS = [
   { href: "/profile", label: "Profile", icon: UserRound },
   { href: "/profile/edit", label: "Edit profile", icon: Pencil },
+  { href: "/friends", label: "Friends", icon: Users },
   { href: "/posts", label: "Posts", icon: LayoutList },
 ];
 

@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Clock, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
 import type { FeedPost } from "@/lib/db";
@@ -59,13 +60,17 @@ const Post = ({ post }: { post: FeedPost }) => {
 
   const sendRequest = useMutation({
     mutationFn: () => sendFriendRequest(author.id),
-    onSettled: refresh,
+    onSettled: () => {
+      refresh();
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "outbound"] });
+    },
   });
   const acceptRequest = useMutation({
     mutationFn: () => acceptFriendRequest(post.requestId!),
     onSettled: () => {
       refresh();
       queryClient.invalidateQueries({ queryKey: ["friends", "requests", "inbound"] });
+      queryClient.invalidateQueries({ queryKey: ["friends", "list"] });
     },
   });
   const removePost = useMutation({
@@ -83,14 +88,17 @@ const Post = ({ post }: { post: FeedPost }) => {
       style={tierStyle}
       className="group relative overflow-hidden rounded-2xl border border-border bg-card/90 shadow-[0_22px_50px_-28px_color-mix(in_oklab,var(--tier)_70%,transparent)] transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tier)_40%,var(--border))] motion-safe:animate-rise"
     >
-      {/* Tier edge + glow */}
       <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-(--tier) to-transparent opacity-80" />
       <div className="pointer-events-none absolute -top-28 -right-20 size-72 rounded-full bg-(--tier) opacity-[0.16] blur-3xl" />
 
       <div className="relative p-5">
         <header className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            <div className="relative shrink-0">
+            <Link
+              href={`/players/${encodeURIComponent(author.username)}`}
+              aria-label={`${name}'s profile`}
+              className="relative shrink-0"
+            >
               {author.image || author.avatar ? (
                 <Image
                   src={(author.image || author.avatar)!}
@@ -111,11 +119,15 @@ const Post = ({ post }: { post: FeedPost }) => {
                   <Image src={rank.icon} alt="" width={14} height={14} />
                 </div>
               )}
-            </div>
+            </Link>
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-baseline gap-x-2">
-                <h3 className="truncate font-bold">{name}</h3>
+                <h3 className="truncate font-bold">
+                  <Link href={`/players/${encodeURIComponent(author.username)}`} className="hover:text-primary hover:underline">
+                    {name}
+                  </Link>
+                </h3>
                 {riotName && (
                   <span className="truncate font-mono text-xs text-muted-foreground">
                     {riotName}

@@ -72,8 +72,8 @@ export async function POST(request: Request) {
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
 
-  const direction = sp.get("direction") ?? "inbound"; // 'inbound' | 'outbound'
-  const countOnly = sp.get("countOnly") === "true"; // boolean
+  const direction = sp.get("direction") ?? "inbound";
+  const countOnly = sp.get("countOnly") === "true";
   const limit = Math.min(Number(sp.get("limit") ?? "20"), 50);
 
   try {

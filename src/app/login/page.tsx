@@ -17,7 +17,6 @@ const FEATURES = [
 const LoginPage = () => {
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-background">
-      {/* Backdrop: grid, ambient glows, diagonal light streak */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_oklab,var(--foreground)_4%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--foreground)_4%,transparent)_1px,transparent_1px)] bg-size-[72px_72px] mask-[radial-gradient(ellipse_at_70%_40%,black_20%,transparent_75%)]" />
         <div className="absolute -top-40 right-[-10%] size-[900px] rounded-full bg-glow/20 blur-[160px]" />
@@ -28,10 +27,8 @@ const LoginPage = () => {
       <EmblemField />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-[clamp(20px,5vw,80px)] pt-10 pb-14">
-        {/* Logo */}
         <BrandLogo />
 
-        {/* Hero */}
         <section className="flex max-w-[840px] flex-1 flex-col justify-center gap-7 py-10">
           <div className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.14em] text-foreground/80">
             <span className="h-0.5 w-7 bg-primary" />
@@ -60,7 +57,6 @@ const LoginPage = () => {
           </div>
         </section>
 
-        {/* Features */}
         <section className="grid max-w-[860px] grid-cols-1 border-t border-border sm:grid-cols-3">
           {FEATURES.map((f, i) => (
             <div

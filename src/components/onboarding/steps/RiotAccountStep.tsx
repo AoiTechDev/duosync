@@ -15,7 +15,6 @@ export default function RiotAccountStep() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [status, setStatus] = useState<Status>(data.riotVerified ? "success" : "idle");
   const [error, setError] = useState("");
-  // Bumped on every successful verify so the reveal animation replays.
   const [revealKey, setRevealKey] = useState(0);
   const nameInput = useRef<HTMLInputElement>(null);
 

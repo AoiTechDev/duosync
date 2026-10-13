@@ -25,9 +25,7 @@ export function StepShell({
   nextLabel?: string;
   nextDisabled?: boolean;
   nextLoading?: boolean;
-  /** Rendered next to the primary button, e.g. "Skip for now". */
   extraAction?: ReactNode;
-  /** Wider column for steps with more content side by side. */
   wide?: boolean;
 }) {
   const column = `mx-auto w-full px-5 ${wide ? "max-w-[800px]" : "max-w-[680px]"}`;

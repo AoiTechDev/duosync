@@ -60,7 +60,6 @@ export async function GET() {
         .orderBy(desc(posts.createdAt)),
     ]);
 
-    // A friendship row stores the pair sorted, so I can be on either side.
     const friendIds = new Set(
       myFriendships.map((f) => (f.userAId === me.id ? f.userBId : f.userAId)),
     );
@@ -71,8 +70,10 @@ export async function GET() {
       myPendingRequests.filter((r) => r.receiverId === me.id).map((r) => [r.senderId, r.id]),
     );
 
-    const withRelation = postsResponse.map((post) => {
-      const authorId = post.author.id;
+    const withRelation = postsResponse.map((rawPost) => {
+      const authorId = rawPost.author.id;
+      const canSeeRiotId = authorId === me.id || friendIds.has(authorId);
+      const post = canSeeRiotId ? rawPost : { ...rawPost, author: { ...rawPost.author, summonerName: null } };
       if (authorId === me.id) return { ...post, relation: "self" as const };
       if (friendIds.has(authorId)) return { ...post, relation: "friend" as const };
       if (sentTo.has(authorId)) return { ...post, relation: "sent" as const };

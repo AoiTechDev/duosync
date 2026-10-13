@@ -36,7 +36,6 @@ export interface CommunicationPreference {
   description: string;
 }
 
-// Role Preferences Data
 export const ROLES: RoleOption[] = [
   {
     id: "TOP",
@@ -76,15 +75,13 @@ export const ROLES: RoleOption[] = [
   {
     id: "FILL",
     name: "Fill",
-    icon: "/lane-icons/top-icon.png", // You might want to create a fill-specific icon
+    icon: "/lane-icons/top-icon.png",
     description: "Flexible with any role",
     color: "from-gray-500 to-slate-500",
   },
 ];
 
-// Playstyle Tags Data
 export const PLAYSTYLE_TAGS: PlaystyleTag[] = [
-  // Behavioral
   {
     id: "aggressive",
     name: "Aggressive",
@@ -104,7 +101,6 @@ export const PLAYSTYLE_TAGS: PlaystyleTag[] = [
     description: "Adapts playstyle to game state",
   },
 
-  // Leadership
   {
     id: "shot-caller",
     name: "Shot Caller",
@@ -124,7 +120,6 @@ export const PLAYSTYLE_TAGS: PlaystyleTag[] = [
     description: "Collaborative decision making",
   },
 
-  // Focus Areas
   {
     id: "carry-focused",
     name: "Carry Focused",
@@ -144,7 +139,6 @@ export const PLAYSTYLE_TAGS: PlaystyleTag[] = [
     description: "Prioritizes dragons, baron, towers",
   },
 
-  // Gameplay Timing
   {
     id: "early-game",
     name: "Early Game",
@@ -165,7 +159,6 @@ export const PLAYSTYLE_TAGS: PlaystyleTag[] = [
   },
 ];
 
-// Goals & Motivation Data
 export const GOALS: Goal[] = [
   {
     id: "ranked-climbing",
@@ -205,7 +198,6 @@ export const GOALS: Goal[] = [
   },
 ];
 
-// Communication Preferences Data
 export const COMMUNICATION_PREFERENCES: CommunicationPreference[] = [
   {
     id: "voice-discord",
@@ -239,7 +231,6 @@ export const COMMUNICATION_PREFERENCES: CommunicationPreference[] = [
   },
 ];
 
-// Category definitions for organizing the UI
 export const PLAYSTYLE_CATEGORIES = {
   behavioral: {
     name: "Behavioral Style",
@@ -259,7 +250,6 @@ export const PLAYSTYLE_CATEGORIES = {
   },
 };
 
-// Validation rules
 export const PREFERENCES_VALIDATION = {
   mainRole: { required: true, message: "Please select a primary role" },
   goals: { minItems: 1, message: "Please select at least one goal" },

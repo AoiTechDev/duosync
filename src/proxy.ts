@@ -7,7 +7,6 @@ export default withAuth(
   async function middleware(req: NextRequestWithAuth) {
     const { pathname } = req.nextUrl;
 
-    // Skip middleware for API routes, static files, and auth pages
     if (
       pathname.startsWith("/api/") ||
       pathname.startsWith("/_next/") ||
@@ -19,13 +18,10 @@ export default withAuth(
 
     const token = await getToken({ req });
 
-    // If user is not authenticated, redirect to login
     if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    // For authenticated users visiting home page, redirect to dashboard
-    // Let the dashboard/onboarding pages handle their own profile checks
     if (pathname === "/") {
       return NextResponse.redirect(new URL("/posts", req.url));
     }
@@ -37,13 +33,10 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
 
-        // Allow access to login page for everyone
         if (pathname === "/login") return true;
 
-        // Allow access to public pages for everyone
         if (pathname === "/") return true;
 
-        // Require authentication for all other pages
         return !!token;
       },
     },
@@ -52,14 +45,6 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - any path with a file extension (public assets like /ranks/GOLD.png)
-     */
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
   ],
 };

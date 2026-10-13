@@ -1,6 +1,6 @@
 ;(async () => {
   const { default: dotenv } = await import('dotenv')
-  dotenv.config({ path: '.env.local' })
+  dotenv.config({ path: '.env' })
 
   console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL)
   console.log('DATABASE_URL format:', (process.env.DATABASE_URL?.substring(0, 15) ?? '') + '...')

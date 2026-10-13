@@ -14,7 +14,7 @@ export async function sendFriendRequest(toUserId: string) {
     throw new Error(message);
   }
 
-  return res.json(); // { id, status: "PENDING", toUserId } (or whatever your route returns)
+  return res.json();
 }
 
 export async function acceptFriendRequest(requestId: string) {
@@ -51,5 +51,30 @@ export async function declineFriendRequest(requestId: string) {
     throw new Error(message);
   }
 
+  return res.json();
+}
+
+async function throwWithMessage(res: Response, fallback: string): Promise<never> {
+  let message = fallback;
+  try {
+    const data = await res.json();
+    message = data?.error || message;
+  } catch {}
+  throw new Error(message);
+}
+
+export async function removeFriend(userId: string) {
+  const res = await fetch(`/api/friends/${userId}`, { method: "DELETE" });
+  if (!res.ok) await throwWithMessage(res, "Failed to remove friend");
+  return res.json();
+}
+
+export async function cancelFriendRequest(requestId: string) {
+  const res = await fetch("/api/friends/cancel", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ requestId }),
+  });
+  if (!res.ok) await throwWithMessage(res, "Failed to cancel request");
   return res.json();
 }

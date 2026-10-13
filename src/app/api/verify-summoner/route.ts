@@ -4,158 +4,79 @@ import { authOptions } from "@/auth/options";
 import { db } from "@/lib/db";
 import { rankEnum, users, type Rank } from "@/db/schema";
 import { eq } from "drizzle-orm";
-
-const RIOT_API_KEY = process.env.RIOT_API_KEY;
-const REGION_ENDPOINTS = {
-  NA1: "na1.api.riotgames.com",
-  EUW1: "euw1.api.riotgames.com",
-  EUN1: "eun1.api.riotgames.com",
-  KR: "kr.api.riotgames.com",
-  BR1: "br1.api.riotgames.com",
-  LA1: "la1.api.riotgames.com",
-  LA2: "la2.api.riotgames.com",
-  OC1: "oc1.api.riotgames.com",
-  RU: "ru.api.riotgames.com",
-  TR1: "tr1.api.riotgames.com",
-  JP1: "jp1.api.riotgames.com",
-};
-
-const REGIONAL_ENDPOINTS = {
-  NA1: "americas.api.riotgames.com",
-  EUW1: "europe.api.riotgames.com",
-  EUN1: "europe.api.riotgames.com",
-  KR: "asia.api.riotgames.com",
-  BR1: "americas.api.riotgames.com",
-  LA1: "americas.api.riotgames.com",
-  LA2: "americas.api.riotgames.com",
-  OC1: "sea.api.riotgames.com",
-  RU: "europe.api.riotgames.com",
-  TR1: "europe.api.riotgames.com",
-  JP1: "asia.api.riotgames.com",
-};
-
-interface RankedEntry {
-  leagueId: string;
-  queueType: string;
-  tier: string;
-  rank: string;
-  puuid: string;
-  leaguePoints: number;
-  wins: number;
-  losses: number;
-  veteran: boolean;
-  inactive: boolean;
-  freshBlood: boolean;
-  hotStreak: boolean;
-}
+import {
+  getAccountByRiotId,
+  getLeagueEntriesByPuuid,
+  getSummonerByPuuid,
+  isRiotRegion,
+  RiotError,
+  type RiotLeagueEntry,
+} from "@/lib/riot";
 
 const APEX_TIERS = ["MASTER", "GRANDMASTER", "CHALLENGER"];
 
-// Riot returns tier "GOLD" + rank "II"; apex tiers come back with rank "I"
-// but are stored without a division.
-function toRank(entry: RankedEntry | undefined): Rank | null {
+function toRank(entry: RiotLeagueEntry | undefined): Rank | null {
   if (!entry) return null;
   const value = APEX_TIERS.includes(entry.tier) ? entry.tier : `${entry.tier}_${entry.rank}`;
   return (rankEnum.enumValues as readonly string[]).includes(value) ? (value as Rank) : null;
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { gameName, tagLine, region } = await request.json();
+
+  if (!isRiotRegion(region)) {
+    return NextResponse.json({ success: false, message: "Invalid region" }, { status: 400 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const { gameName, tagLine, region } = await request.json();
-
-    if (!RIOT_API_KEY) {
-      return NextResponse.json(
-        { success: false, message: "Riot API key not configured" },
-        { status: 500 },
-      );
-    }
-
-    const regionalEndpoint = REGIONAL_ENDPOINTS[region as keyof typeof REGIONAL_ENDPOINTS];
-    const platformEndpoint = REGION_ENDPOINTS[region as keyof typeof REGION_ENDPOINTS];
-
-    if (!regionalEndpoint || !platformEndpoint) {
-      return NextResponse.json({ success: false, message: "Invalid region" }, { status: 400 });
-    }
-
-    // Get account by riot ID (gameName#tagLine)
-    const accountResponse = await fetch(
-      `https://${regionalEndpoint}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}?api_key=${RIOT_API_KEY}`,
-    );
-
-    if (!accountResponse.ok) {
-      if (accountResponse.status === 404) {
-        return NextResponse.json({
-          success: false,
-          message: "Account not found",
-        });
+    let account;
+    try {
+      account = await getAccountByRiotId(region, gameName, tagLine);
+    } catch (e) {
+      if (e instanceof RiotError && e.status === 404) {
+        return NextResponse.json({ success: false, message: "Account not found" });
       }
-      if (accountResponse.status === 401 || accountResponse.status === 403) {
-        console.error("Riot API key rejected:", accountResponse.status);
-        return NextResponse.json(
-          { success: false, message: "Riot API key is invalid or expired" },
-          { status: 502 },
-        );
-      }
-      if (accountResponse.status === 429) {
-        return NextResponse.json(
-          { success: false, message: "Too many requests to Riot, try again in a minute" },
-          { status: 429 },
-        );
-      }
-      throw new Error(`Riot API request failed: ${accountResponse.status}`);
+      throw e;
     }
 
-    const account = await accountResponse.json();
-
-    // Get summoner by PUUID
-    const summonerResponse = await fetch(
-      `https://${platformEndpoint}/lol/summoner/v4/summoners/by-puuid/${account.puuid}?api_key=${RIOT_API_KEY}`,
-    );
-
-    if (!summonerResponse.ok) {
-      return NextResponse.json({
-        success: false,
-        message: "Summoner not found for this region",
-      });
+    let summoner;
+    try {
+      summoner = await getSummonerByPuuid(region, account.puuid);
+    } catch (e) {
+      if (e instanceof RiotError && e.status === 404) {
+        return NextResponse.json({ success: false, message: "Summoner not found for this region" });
+      }
+      throw e;
     }
-
-    const summoner = await summonerResponse.json();
-
-    // Get rank information using PUUID
-    const rankedResponse = await fetch(
-      `https://${platformEndpoint}/lol/league/v4/entries/by-puuid/${account.puuid}?api_key=${RIOT_API_KEY}`,
-    );
 
     let soloRank: Rank | null = null;
     let flexRank: Rank | null = null;
 
-    if (rankedResponse.ok) {
-      const rankedData: RankedEntry[] = await rankedResponse.json();
-
-      soloRank = toRank(rankedData.find((entry) => entry.queueType === "RANKED_SOLO_5x5"));
-      flexRank = toRank(rankedData.find((entry) => entry.queueType === "RANKED_FLEX_SR"));
+    try {
+      const entries = await getLeagueEntriesByPuuid(region, account.puuid);
+      soloRank = toRank(entries.find((entry) => entry.queueType === "RANKED_SOLO_5x5"));
+      flexRank = toRank(entries.find((entry) => entry.queueType === "RANKED_FLEX_SR"));
+    } catch (e) {
+      console.error("Riot league lookup failed:", e);
     }
+
+    const summonerName = `${account.gameName}#${account.tagLine}`;
 
     await db
       .update(users)
-      .set({
-        summonerName: `${account.gameName}#${account.tagLine}`,
-        soloRank,
-        flexRank,
-        updatedAt: new Date(),
-      })
+      .set({ summonerName, soloRank, flexRank, updatedAt: new Date() })
       .where(eq(users.email, session.user.email));
 
     return NextResponse.json({
       success: true,
       data: {
-        summonerName: `${account.gameName}#${account.tagLine}`,
+        summonerName,
         gameName: account.gameName,
         tagLine: account.tagLine,
         level: summoner.summonerLevel,
@@ -164,7 +85,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Riot API error:", error);
+    if (error instanceof RiotError) {
+      console.error("Riot API error:", error.status, error.message);
+      return NextResponse.json({ success: false, message: error.message }, { status: error.status });
+    }
+    console.error("Verify summoner failed:", error);
     return NextResponse.json(
       { success: false, message: "Failed to verify summoner" },
       { status: 500 },

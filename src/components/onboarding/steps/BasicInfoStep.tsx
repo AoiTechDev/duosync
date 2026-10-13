@@ -36,7 +36,6 @@ export default function BasicInfoStep() {
       });
       const result = await res.json();
       const next: Status = result.available ? "available" : "taken";
-      // Ignore answers for a value the user has already typed past.
       if (latest.current === value) setStatus(next);
       return next;
     } catch {

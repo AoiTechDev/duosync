@@ -6,8 +6,6 @@ import BasicInfoStep from "./steps/BasicInfoStep";
 import RiotAccountStep from "./steps/RiotAccountStep";
 import PreferencesStep from "./steps/PreferencesStep";
 
-// Steps copy store data into local state on mount, so wait until the persisted
-// wizard state has been read from localStorage before rendering one.
 function useHasHydrated() {
   return useSyncExternalStore(
     (onChange) => useOnboardingStore.persist.onFinishHydration(onChange),

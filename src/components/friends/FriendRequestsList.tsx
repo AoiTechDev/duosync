@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, UserRound, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ export type InboundRequest = {
 
 export const INBOUND_KEY = ["friends", "requests", "inbound"];
 
-/** Shared inbound-requests query; the navbar badge and the lists all read the same cache. */
 export function useInboundRequests() {
   return useQuery({
     queryKey: INBOUND_KEY,
@@ -45,12 +45,12 @@ function Avatar({ user }: { user: InboundRequest["otherUser"] }) {
 export function FriendRequestsList({ compact }: { compact?: boolean }) {
   const queryClient = useQueryClient();
   const { data, isLoading, isError, refetch } = useInboundRequests();
-  // Accepted rows stay visible with a "Friends" pill until the list is closed.
   const [accepted, setAccepted] = useState<InboundRequest[]>([]);
 
   const onSettled = () => {
     queryClient.invalidateQueries({ queryKey: INBOUND_KEY });
     queryClient.invalidateQueries({ queryKey: ["posts"] });
+    queryClient.invalidateQueries({ queryKey: ["friends", "list"] });
   };
   const accept = useMutation({
     mutationFn: (r: InboundRequest) => acceptFriendRequest(r.id),
@@ -60,7 +60,6 @@ export function FriendRequestsList({ compact }: { compact?: boolean }) {
   const decline = useMutation({ mutationFn: (r: InboundRequest) => declineFriendRequest(r.id), onSettled });
 
   const pending = data?.items ?? [];
-  // Newest first, like the API, so an accepted row keeps its place.
   const rows = [
     ...pending.filter((r) => !accepted.some((a) => a.id === r.id)).map((r) => ({ r, done: false })),
     ...accepted.map((r) => ({ r, done: true })),
@@ -111,7 +110,16 @@ export function FriendRequestsList({ compact }: { compact?: boolean }) {
               {!compact && <Avatar user={r.otherUser} />}
               {compact && rank?.icon && <Image src={rank.icon} alt="" width={22} height={22} />}
               <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold">{r.otherUser.username ?? "Unknown"}</div>
+                {r.otherUser.username ? (
+                  <Link
+                    href={`/players/${encodeURIComponent(r.otherUser.username)}`}
+                    className="block truncate text-sm font-semibold hover:text-primary hover:underline"
+                  >
+                    {r.otherUser.username}
+                  </Link>
+                ) : (
+                  <div className="truncate text-sm font-semibold">Unknown</div>
+                )}
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   {!compact && rank?.icon && <Image src={rank.icon} alt="" width={14} height={14} />}
                   {rank?.label ?? "Unranked"}

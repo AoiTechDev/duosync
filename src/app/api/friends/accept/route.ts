@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/auth";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import z from "zod";
-import { friendRequests, friendships, users } from "@/db/schema";
+import { friendRequests, friendships } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 const BodySchema = z.object({
   requestId: z.string().uuid(),
@@ -47,29 +47,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const [a, b] = me.id < fr.receiverId ? [me.id, fr.receiverId] : [fr.receiverId, me.id];
-    const existingFriendship = await db.query.friendships.findFirst({
-      where: and(eq(friendships.userAId, a), eq(friendships.userBId, b)),
-    });
-    if (existingFriendship) {
-      return NextResponse.json({ error: "Already friends" }, { status: 409 });
-    }
+    const [a, b] = fr.senderId < me.id ? [fr.senderId, me.id] : [me.id, fr.senderId];
 
     await db.transaction(async (tx) => {
       await tx
         .update(friendRequests)
-        .set({
-          status: "ACCEPTED",
-        })
+        .set({ status: "ACCEPTED" })
         .where(and(eq(friendRequests.id, requestId), eq(friendRequests.status, "PENDING")));
 
-      await tx
-        .insert(friendships)
-        .values({
-          userAId: a,
-          userBId: b,
-        })
-        .onConflictDoNothing();
+      await tx.insert(friendships).values({ userAId: a, userBId: b }).onConflictDoNothing();
     });
     return NextResponse.json({ status: 201 });
   } catch (err) {

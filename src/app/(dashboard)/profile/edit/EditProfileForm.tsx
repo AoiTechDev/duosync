@@ -189,7 +189,6 @@ export function EditProfileForm({
         </div>
       </div>
 
-      {/* Sticky save bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/85 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-[760px] items-center justify-between gap-3 px-5 py-4">
           <span className="flex items-center gap-2 text-sm text-muted-foreground">

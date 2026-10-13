@@ -1,13 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
-import { Check, Pencil } from "lucide-react";
+import { Check, Lock, Pencil } from "lucide-react";
 import type { User } from "@/db/schema";
+import type { PostRelation } from "@/lib/db";
 import { ROLES, GOALS, PLAYSTYLE_TAGS, COMMUNICATION_PREFERENCES } from "@/data/preferences";
 import { findRegion } from "@/data/regions";
 import { parseRank } from "@/lib/rank";
-import { getUserAvatarUrl, getUserInitials } from "@/auth";
+import { getUserInitials } from "@/auth";
 import { RiotLinkCard } from "./RiotLinkCard";
+import { ProfileAction } from "./ProfileAction";
 
 const nameOf = (list: { id: string; name: string }[], id: string) => list.find((x) => x.id === id)?.name ?? id;
 const role = (id?: string | null) => ROLES.find((r) => r.id === id);
@@ -63,18 +65,43 @@ function RankHalf({ queue, rank }: { queue: string; rank: string | null }) {
   );
 }
 
-export function ProfileView({ user }: { user: User }) {
+export type PublicProfile = Pick<
+  User,
+  | "id"
+  | "username"
+  | "name"
+  | "image"
+  | "avatar"
+  | "summonerName"
+  | "region"
+  | "soloRank"
+  | "flexRank"
+  | "mainRole"
+  | "secondaryRole"
+  | "bio"
+  | "goals"
+  | "playstyle"
+  | "communication"
+>;
+
+export function ProfileView({
+  user,
+  viewer,
+}: {
+  user: PublicProfile;
+  viewer?: { relation: PostRelation; requestId?: string };
+}) {
+  const isOwner = !viewer;
   const solo = parseRank(user.soloRank);
   const region = findRegion(user.region);
   const [riotName, riotTag] = (user.summonerName ?? "").split("#");
-  const avatar = getUserAvatarUrl(user);
+  const avatar = user.avatar || user.image || undefined;
   const goals = user.goals ?? [];
   const playstyle = user.playstyle ?? [];
   const communication = user.communication ?? [];
 
   return (
     <div style={{ "--tier": solo?.color ?? "var(--primary)" } as CSSProperties}>
-      {/* Hero banner */}
       <section className="relative overflow-hidden border-b border-border bg-[linear-gradient(110deg,color-mix(in_oklab,var(--card)_80%,transparent),color-mix(in_oklab,var(--glow)_22%,var(--card))_70%,color-mix(in_oklab,var(--tier)_18%,var(--card)))]">
         <div className="pointer-events-none absolute -top-1/2 left-[45%] h-[200%] w-24 rotate-[24deg] bg-foreground/[0.04]" />
         {solo?.icon && (
@@ -124,12 +151,21 @@ export function ProfileView({ user }: { user: User }) {
               </div>
             </div>
           </div>
-          <Link
-            href="/profile/edit"
-            className="inline-flex h-10 shrink-0 items-center gap-2 self-start rounded-[10px] border border-electric px-4 text-sm font-semibold text-electric transition-[background-color,box-shadow] hover:bg-electric/5 hover:shadow-[0_0_18px_color-mix(in_oklab,var(--electric)_40%,transparent)] sm:self-auto"
-          >
-            <Pencil className="size-4" /> Edit profile
-          </Link>
+          {isOwner ? (
+            <Link
+              href="/profile/edit"
+              className="inline-flex h-10 shrink-0 items-center gap-2 self-start rounded-[10px] border border-electric px-4 text-sm font-semibold text-electric transition-[background-color,box-shadow] hover:bg-electric/5 hover:shadow-[0_0_18px_color-mix(in_oklab,var(--electric)_40%,transparent)] sm:self-auto"
+            >
+              <Pencil className="size-4" /> Edit profile
+            </Link>
+          ) : (
+            <ProfileAction
+              userId={user.id}
+              relation={viewer.relation}
+              requestId={viewer.requestId}
+              className="self-start sm:self-auto"
+            />
+          )}
         </div>
       </section>
 
@@ -223,9 +259,37 @@ export function ProfileView({ user }: { user: User }) {
                   </div>
                 ))}
               </dl>
+              <p className="mt-4 flex items-start gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
+                <Lock className="mt-0.5 size-3.5 shrink-0 text-electric" />
+                {isOwner
+                  ? "Only you and your accepted friends can see your Riot ID."
+                  : "Visible because you are friends."}
+              </p>
             </section>
-          ) : (
+          ) : isOwner ? (
             <RiotLinkCard region={user.region} />
+          ) : (
+            <section className="rounded-2xl border border-border bg-card/80 p-5">
+              <div className="flex size-10 items-center justify-center rounded-full bg-popover text-electric">
+                <Lock className="size-5" />
+              </div>
+              <h2 className="mt-3 font-display text-[18px] leading-tight font-black uppercase tracking-[-0.02em]">
+                {viewer.relation === "friend" ? "Riot ID not linked" : "Riot ID is private"}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {viewer.relation === "friend"
+                  ? `${user.username} hasn't linked a Riot account yet.`
+                  : `Become friends with ${user.username} to see their Riot ID and add them in the client.`}
+              </p>
+              {viewer.relation !== "friend" && (
+                <ProfileAction
+                  userId={user.id}
+                  relation={viewer.relation}
+                  requestId={viewer.requestId}
+                  className="mt-4"
+                />
+              )}
+            </section>
           )}
         </aside>
       </div>

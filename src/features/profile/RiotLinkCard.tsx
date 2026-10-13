@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-/** Shown on the profile when no Riot account is linked yet. */
 export function RiotLinkCard({ region }: { region: string | null }) {
   const router = useRouter();
   const [riotId, setRiotId] = useState("");
@@ -27,7 +26,7 @@ export function RiotLinkCard({ region }: { region: string | null }) {
       });
       const result = await response.json();
       if (result.success) {
-        router.refresh(); // the route saved name and ranks; reload server data
+        router.refresh();
       } else {
         setError(result.message || "Account not found");
       }

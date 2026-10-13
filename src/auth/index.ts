@@ -1,7 +1,5 @@
-// Server-side auth functions
 export { getCurrentUser, isAuthenticated, getCurrentSession } from "./server";
 
-// Auth utility functions
 export {
   getUserInitials,
   getUserDisplayName,
@@ -10,5 +8,4 @@ export {
   getUserAvatarUrl,
 } from "./utils";
 
-// Auth types
 export type { AuthUser, UserDisplayHelpers } from "./types";

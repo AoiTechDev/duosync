@@ -4,15 +4,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// `hovered:` / `pressed:` are custom variants from globals.css. They behave like
-// hover:/active:, but can also be forced with data-force="hover" | "active".
 const buttonVariants = cva(
   "relative isolate inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] text-sm font-semibold cursor-pointer transition-[transform,filter,box-shadow,background-color,border-color,color] duration-200 ease-out hovered:-translate-y-0.5 pressed:translate-y-0 pressed:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
-        // Gold, notched. The shape lives on ::before so the drop-shadow on the
-        // button itself is not cut off by clip-path, and follows the notch.
         default: [
           "rounded-none text-primary-foreground",
           "before:absolute before:inset-0 before:-z-10",
@@ -54,7 +50,6 @@ const buttonVariants = cva(
           "pressed:bg-[color-mix(in_oklab,var(--foreground),black_10%)] pressed:shadow-none",
           "disabled:bg-foreground/20 disabled:text-primary-foreground/50",
         ],
-        // Kept for existing call sites (variant="outline" is used across the app).
         outline: [
           "border border-input bg-transparent text-foreground",
           "hovered:bg-popover hovered:border-electric/60",

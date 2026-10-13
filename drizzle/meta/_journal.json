@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1756164943041,
-      "tag": "0000_windy_network",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1756166523082,
-      "tag": "0001_complete_karen_page",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1756240884089,
-      "tag": "0002_complex_starhawk",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1756241495437,
-      "tag": "0003_mute_stone_men",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1756938222255,
-      "tag": "0004_swift_sersi",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1757012111676,
-      "tag": "0005_nostalgic_sandman",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1758321619626,
-      "tag": "0006_wealthy_night_thrasher",
+      "when": 1791922824073,
+      "tag": "0000_baseline",
       "breakpoints": true
     }
   ]

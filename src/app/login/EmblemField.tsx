@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-// Positions are % of the field (center of each item), sizes in px.
 const RANKS = [
   { src: "/ranks/CHALLANGER.png", tier: "challenger", size: 220, left: 53, top: 15, delay: 0 },
   { src: "/ranks/GRANDMASTER.png", tier: "grandmaster", size: 120, left: 93, top: 14, delay: 1.2 },

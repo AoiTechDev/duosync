@@ -10,8 +10,9 @@ import {
   unique,
   primaryKey,
   index,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import type { AdapterAccount } from "next-auth/adapters";
 import { regions } from "@/data/constants";
 
@@ -79,7 +80,6 @@ export const friendshipStatusEnum = pgEnum("friendship_status", [
   "CANCELED",
 ]);
 
-// NextAuth adapter tables
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name"),
@@ -87,7 +87,6 @@ export const users = pgTable("users", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
 
-  // Custom fields
   username: text("username").unique().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -185,6 +184,7 @@ export const friendships = pgTable(
     uniqueFriendship: unique().on(table.userAId, table.userBId),
     userAIdx: index().on(table.userAId),
     userBIdx: index().on(table.userBId),
+    orderedPair: check("friendships_ordered_pair", sql`${table.userAId} < ${table.userBId}`),
   }),
 );
 
@@ -207,7 +207,6 @@ export const friendRequests = pgTable(
   }),
 );
 
-// Relations
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
@@ -227,7 +226,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const postsRelations = relations(posts, ({ one, many }) => ({
+export const postsRelations = relations(posts, ({ one }) => ({
   author: one(users, {
     fields: [posts.authorId],
     references: [users.id],

@@ -16,14 +16,12 @@ export async function POST(request: NextRequest) {
     const profileData = await request.json();
 
     console.log("Profile data:", profileData);
-    // Update user profile in database
     await db
       .update(users)
       .set({
         username: profileData.username?.toLowerCase(),
         region: profileData.region || null,
         summonerName: profileData.summonerName || null,
-        // Handle null/undefined ranks (unranked players)
         soloRank:
           profileData.soloRank === "UNRANKED" || !profileData.soloRank
             ? null

@@ -120,7 +120,6 @@ const Posts = ({ user }: { user: User }) => {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <div className="space-y-4 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-sm sm:space-y-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <FilterLabel>Role</FilterLabel>

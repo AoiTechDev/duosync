@@ -95,7 +95,6 @@ export default function PreferencesStep() {
     setPreferences((prev) => ({
       ...prev,
       mainRole: id,
-      // A role can't be both main and secondary.
       secondaryRole: prev.secondaryRole === id ? "" : prev.secondaryRole,
     }));
 
@@ -109,7 +108,7 @@ export default function PreferencesStep() {
 
     updateData(preferences);
     setSubmitting(true);
-    await completeOnboarding(); // redirects to /posts on success
+    await completeOnboarding();
     setSubmitting(false);
   };
 

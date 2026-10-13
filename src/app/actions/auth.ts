@@ -50,7 +50,6 @@ const updateUserSchema = z.object({
     .trim()
     .min(3, "At least 3 characters")
     .max(24, "At most 24 characters"),
-  // Only regions the database's `region` enum accepts.
   region: z.enum(["NA1", "EUW1", "EUN1", "KR", "BR1", "LA1", "LA2"], { message: "Pick a region" }),
   bio: z.string().trim().max(200, "At most 200 characters"),
 });
@@ -59,7 +58,6 @@ export interface UpdateProfileState {
   errors?: Partial<Record<"username" | "region" | "bio" | "form", string>>;
 }
 
-// Summoner name is not editable here: it comes from Riot verification.
 export async function updateUserProfile(
   _prevState: UpdateProfileState,
   formData: FormData,
@@ -101,7 +99,6 @@ export async function updateUserProfile(
     return { errors: { form: "Couldn't save your profile. Try again." } };
   }
 
-  // Outside try/catch: redirect() works by throwing.
   revalidatePath("/profile");
   redirect("/profile");
 }

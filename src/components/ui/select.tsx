@@ -12,7 +12,6 @@ function Select({
   onValueChange,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  // Normalize to controlled usage to avoid uncontrolled->controlled warnings.
   const controlledValue = (value ?? defaultValue ?? "") as string | undefined;
   return (
     <SelectPrimitive.Root

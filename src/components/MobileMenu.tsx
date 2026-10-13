@@ -10,11 +10,11 @@ import { RequestCount } from "./FriendsDropdown";
 
 const LINKS = [
   { href: "/posts", label: "Feed" },
+  { href: "/friends", label: "Friends" },
   { href: "/profile", label: "Profile" },
   { href: "/profile/edit", label: "Edit profile" },
 ];
 
-/** Phone navigation: slides in from the right. `userBlock` is rendered on the server. */
 export function MobileMenu({ userBlock }: { userBlock: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();

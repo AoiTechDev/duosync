@@ -14,7 +14,6 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID as string,
       clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
-      // Discord sends `iss` on the OAuth callback; next-auth v4 needs this to validate it.
       issuer: "https://discord.com",
     }),
   ],
@@ -80,7 +79,7 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (url.startsWith(baseUrl)) return url;
-      return `${baseUrl}/dashboard`; // Let middleware handle smart routing
+      return `${baseUrl}/dashboard`;
     },
   },
   debug: process.env.NODE_ENV === "development",

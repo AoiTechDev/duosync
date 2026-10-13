@@ -2,8 +2,8 @@ import { getCurrentUser } from "@/auth";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import z from "zod";
-import { friendRequests, friendships, users } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { friendRequests } from "@/db/schema";
+import { eq } from "drizzle-orm";
 const BodySchema = z.object({
   requestId: z.string().uuid(),
 });

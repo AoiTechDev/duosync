@@ -41,7 +41,6 @@ async function seed() {
     ])
     .returning();
 
-  // Create sample posts
   await db.insert(posts).values([
     {
       description:

@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-/* Interaction states that can also be forced with data-force="hover|active" (used by /test-components). */
 @custom-variant hovered (&:hover:not(:disabled), &[data-force="hover"]);
 @custom-variant pressed (&:active:not(:disabled), &[data-force="active"]);
 
@@ -65,7 +64,6 @@
     }
   }
 
-  /* Rank reveal (onboarding step 2) */
   --animate-ring-in: ring-in 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
   @keyframes ring-in {
     from {

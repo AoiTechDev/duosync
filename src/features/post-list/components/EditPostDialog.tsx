@@ -24,7 +24,6 @@ function EditPostForm({ postId, onDone }: { postId: string; onDone: () => void }
     );
   }
 
-  // Mounted once the post has loaded, so the form starts with its values.
   return (
     <PostForm
       key={data.id}
