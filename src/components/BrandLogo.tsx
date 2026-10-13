@@ -12,7 +12,7 @@ export function BrandLogo() {
         className="h-8 w-auto drop-shadow-[0_0_10px_color-mix(in_oklab,var(--accent)_45%,transparent)]"
       />
       <div className="font-display text-[20px] font-black uppercase tracking-[-0.01em]">
-        Duo<span className="text-primary">sync</span>
+        Duo<span className="text-primary">GG</span>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import EmblemField from "./EmblemField";
 import { BrandLogo } from "@/components/BrandLogo";
 
 export const metadata: Metadata = {
-  title: "Sign in · DuoSync",
+  title: "Sign in · DuoGG",
   description: "Find your League of Legends duo. Match by rank, role and playstyle.",
 };
 

@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "duosync-dev",
+      "name": "duogg-dev",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
       "port": 3000

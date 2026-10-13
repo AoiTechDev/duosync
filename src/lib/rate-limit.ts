@@ -29,7 +29,7 @@ function upstashLimiter(name: RateLimitName, client: Redis) {
     limiter = new Ratelimit({
       redis: client,
       limiter: Ratelimit.slidingWindow(limit, window),
-      prefix: `duosync:rl:${name}`,
+      prefix: `duogg:rl:${name}`,
       ephemeralCache: new Map(),
       timeout: 1000,
     });

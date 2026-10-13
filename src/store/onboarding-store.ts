@@ -88,7 +88,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
       reset: () => set({ currentStep: 1, data: {}, isCompleted: false }),
     }),
     {
-      name: "duosync-onboarding",
+      name: "duogg-onboarding",
       migrate: (persistedState: unknown, version: number) => {
         if (persistedState && typeof persistedState === "object" && "data" in persistedState) {
           const state = persistedState as { data: Record<string, unknown> };

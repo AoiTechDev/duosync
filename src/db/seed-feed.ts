@@ -12,7 +12,7 @@ import {
   type Region,
 } from "./schema";
 
-const EMAIL_DOMAIN = "@seed.duosync.test";
+const EMAIL_DOMAIN = "@seed.duogg.test";
 const toUsername = (name: string) => name.toLowerCase();
 const PLAYERS = 40;
 const POSTS = 300;

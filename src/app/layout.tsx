@@ -19,7 +19,7 @@ const unbounded = Unbounded({
 });
 
 export const metadata: Metadata = {
-  title: "DuoSync",
+  title: "DuoGG",
   description: "Find your League of Legends duo partner.",
 };
 

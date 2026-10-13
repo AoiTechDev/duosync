@@ -15,7 +15,7 @@ export default async function Navbar() {
     <header className="sticky top-0 z-50 h-16 border-b border-border bg-background/70 backdrop-blur-xl">
       <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
       <div className="mx-auto flex h-full w-full max-w-[1120px] items-center justify-between px-5">
-        <Link href="/posts" aria-label="DuoSync home">
+        <Link href="/posts" aria-label="DuoGG home">
           <BrandLogo />
         </Link>
         <NavLinks />

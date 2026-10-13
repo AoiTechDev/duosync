@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { isProfileComplete } from "@/auth/utils";
 import PostsList from "@/features/post-list/Posts";
 
-export const metadata: Metadata = { title: "Duo feed · DuoSync" };
+export const metadata: Metadata = { title: "Duo feed · DuoGG" };
 
 export default async function PostPage() {
   const user = await getCurrentUser();
