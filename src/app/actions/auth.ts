@@ -1,7 +1,6 @@
 "use server";
 
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/auth/options";
+import { getCurrentUser } from "@/auth/server";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,32 +9,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { regionSchema, usernameSchema } from "@/validators/profile-validator";
 
-export async function signInAction(provider: "google" | "discord") {
-  redirect(`/api/auth/signin/${provider}`);
-}
-
-export async function signOutAction() {
-  redirect("/api/auth/signout");
-}
-
-export async function getCurrentUser() {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return null;
-    }
-
-    const user = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
-
-    return user[0] || null;
-  } catch (error) {
-    console.error("Get current user error:", error);
-    return null;
-  }
-}
-
-export async function requireAuth() {
+async function requireAuth() {
   const user = await getCurrentUser();
 
   if (!user) {

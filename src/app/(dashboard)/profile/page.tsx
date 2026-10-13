@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCurrentUser } from "@/app/actions/auth";
+import { getCurrentUser } from "@/auth";
 import { redirect } from "next/navigation";
 import { ProfileView } from "@/features/profile/ProfileView";
 

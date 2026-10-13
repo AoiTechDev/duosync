@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/app/actions/auth";
+import { getCurrentUser } from "@/auth";
 import { EditProfileForm } from "./EditProfileForm";
 
 export const metadata: Metadata = { title: "Edit profile · DuoSync" };
