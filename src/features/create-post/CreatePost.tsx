@@ -1,10 +1,5 @@
 "use client";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Form from "./components/Form";
 import { User } from "@/db/schema";
 import { Plus } from "lucide-react";
@@ -26,9 +21,7 @@ const CreatePost = ({ user }: { user: User }) => {
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               <div className="flex-1">
-                <div className="text-lg font-semibold text-foreground mb-1">
-                  Create Duo Request
-                </div>
+                <div className="text-lg font-semibold text-foreground mb-1">Create Duo Request</div>
                 <div className="text-sm text-muted-foreground">
                   Share your playstyle and find the perfect partner...
                 </div>

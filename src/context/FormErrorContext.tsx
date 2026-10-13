@@ -6,9 +6,7 @@ type FormErrorContextType = {
   errors?: Record<string, string[]> | null;
 };
 
-const FormErrorContext = createContext<FormErrorContextType | undefined>(
-  undefined
-);
+const FormErrorContext = createContext<FormErrorContextType | undefined>(undefined);
 
 export function FormErrorProvider({
   children,
@@ -17,11 +15,7 @@ export function FormErrorProvider({
   children: ReactNode;
   errors?: Record<string, string[]> | null;
 }) {
-  return (
-    <FormErrorContext.Provider value={{ errors }}>
-      {children}
-    </FormErrorContext.Provider>
-  );
+  return <FormErrorContext.Provider value={{ errors }}>{children}</FormErrorContext.Provider>;
 }
 
 export function useFormErrors() {

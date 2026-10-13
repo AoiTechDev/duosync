@@ -42,7 +42,6 @@ export async function declineFriendRequest(requestId: string) {
     body: JSON.stringify({ requestId }),
   });
 
-
   if (!res.ok) {
     let message = "Failed to decline friend request";
     try {

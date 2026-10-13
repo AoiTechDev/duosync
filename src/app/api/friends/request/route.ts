@@ -19,19 +19,13 @@ export async function POST(request: Request) {
     const json = await request.json().catch(() => null);
     const parse = BodySchema.safeParse(json);
     if (!parse.success) {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
     const { toUserId } = parse.data;
 
     if (toUserId === me.id) {
-      return NextResponse.json(
-        { error: "Cannot send a request to yourself" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Cannot send a request to yourself" }, { status: 400 });
     }
 
     const target = await db.query.users.findFirst({
@@ -53,24 +47,14 @@ export async function POST(request: Request) {
       where: and(
         eq(friendRequests.status, "PENDING"),
         or(
-          and(
-            eq(friendRequests.senderId, me.id),
-            eq(friendRequests.receiverId, toUserId)
-          ),
-          and(
-            eq(friendRequests.senderId, toUserId),
-            eq(friendRequests.receiverId, me.id)
-          )
-        )
+          and(eq(friendRequests.senderId, me.id), eq(friendRequests.receiverId, toUserId)),
+          and(eq(friendRequests.senderId, toUserId), eq(friendRequests.receiverId, me.id)),
+        ),
       ),
     });
     if (pending) {
-      const dir =
-        pending.senderId === me.id ? "already sent" : "incoming request exists";
-      return NextResponse.json(
-        { error: `Pending request ${dir}` },
-        { status: 409 }
-      );
+      const dir = pending.senderId === me.id ? "already sent" : "incoming request exists";
+      return NextResponse.json({ error: `Pending request ${dir}` }, { status: 409 });
     }
 
     const [created] = await db
@@ -78,16 +62,10 @@ export async function POST(request: Request) {
       .values({ senderId: me.id, receiverId: toUserId, status: "PENDING" })
       .returning({ id: friendRequests.id, status: friendRequests.status });
 
-    return NextResponse.json(
-      { id: created.id, status: created.status, toUserId },
-      { status: 201 }
-    );
+    return NextResponse.json({ id: created.id, status: created.status, toUserId }, { status: 201 });
   } catch (err) {
     console.error("Friend request error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -95,7 +73,7 @@ export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
 
   const direction = sp.get("direction") ?? "inbound"; // 'inbound' | 'outbound'
-  const countOnly = sp.get("countOnly") === "true";   // boolean
+  const countOnly = sp.get("countOnly") === "true"; // boolean
   const limit = Math.min(Number(sp.get("limit") ?? "20"), 50);
 
   try {
@@ -109,9 +87,7 @@ export async function GET(request: NextRequest) {
     const items = await db.query.friendRequests.findMany({
       where: and(
         eq(friendRequests.status, "PENDING"),
-        isInbound
-          ? eq(friendRequests.receiverId, me.id)
-          : eq(friendRequests.senderId, me.id)
+        isInbound ? eq(friendRequests.receiverId, me.id) : eq(friendRequests.senderId, me.id),
       ),
       orderBy: (fr, { desc: d }) => [d(fr.createdAt), d(fr.id)],
       limit: countOnly ? undefined : limit,
@@ -147,10 +123,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json(
-      { items: responseItems, nextCursor: null },
-      { status: 200, headers }
-    );
+    return NextResponse.json({ items: responseItems, nextCursor: null }, { status: 200, headers });
   } catch (err) {
     console.error("List friend requests error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

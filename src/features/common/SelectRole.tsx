@@ -4,21 +4,12 @@ import { TagButton } from "@/components/common/TagButton";
 import type { Role } from "@/types/create-post-type";
 import { useFieldError } from "@/context/FormErrorContext";
 
-const SelectRole = ({
-  role,
-  onChange,
-}: {
-  role: Role | null;
-  onChange: (role: Role) => void;
-}) => {
+const SelectRole = ({ role, onChange }: { role: Role | null; onChange: (role: Role) => void }) => {
   const error = useFieldError("role");
 
   return (
     <div className="space-y-2">
-      <label
-        htmlFor="role"
-        className="text-base font-semibold flex items-center gap-2"
-      >
+      <label htmlFor="role" className="text-base font-semibold flex items-center gap-2">
         What role you are looking for?
       </label>
       <div className="flex flex-wrap gap-2" id="role">

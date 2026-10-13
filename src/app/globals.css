@@ -2,82 +2,114 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+/* Interaction states that can also be forced with data-force="hover|active" (used by /test-components). */
+@custom-variant hovered (&:hover:not(:disabled), &[data-force="hover"]);
+@custom-variant pressed (&:active:not(:disabled), &[data-force="active"]);
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-fg);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent-foreground: var(--primary-foreground);
+  --color-card-foreground: var(--foreground);
+  --color-popover-foreground: var(--foreground);
+  --color-input: var(--input);
+  --color-ring: var(--primary);
+  --color-discord: var(--discord);
+  --color-electric: var(--electric);
+  --color-glow: var(--glow);
+  --color-success: var(--success);
+  --color-iron: var(--iron);
+  --color-bronze: var(--bronze);
+  --color-silver: var(--silver);
+  --color-gold: var(--gold);
+  --color-platinum: var(--platinum);
+  --color-emerald: var(--emerald);
+  --color-diamond: var(--diamond);
+  --color-master: var(--master);
+  --color-grandmaster: var(--grandmaster);
+  --color-challenger: var(--challenger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  --font-display: var(--font-unbounded);
+  --text--xl: 4rem;
+  --text-lg: 2.5rem;
+  --text-md: 1.75rem;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-rise: rise 250ms var(--ease-out-soft) both;
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  --animate-float: float 7s ease-in-out infinite;
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
+    }
+  }
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #08090a; /* Dark Background */
-  --foreground: #FFFFFF; /* White */
-  --card: #0f1011; /* Secondary Dark */
-  --card-foreground: #FFFFFF;
-  --popover: #1F2833; /* Secondary Dark */
-  --popover-foreground: #FFFFFF;
-  --primary: #3B82F6; /* Vibrant Blue */
-  --primary-foreground: #FFFFFF;
-  --secondary: #2563EB; /* Deep Blue */
-  --secondary-foreground: #FFFFFF;
-  --muted: #4D4D4D; /* Medium Gray */
-  --muted-foreground: #C5C6C7; /* Light Gray */
-  --accent: #60A5FA; /* Light Blue */
-  --accent-foreground: #FFFFFF;
-  --destructive: oklch(0.577 0.245 27.325); /* unchanged */
-  --border: #1b1c1d; /* Medium Gray */
-  --input: #4D4D4D; /* Medium Gray */
-  --ring: #C5C6C7; /* Light Gray */
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #1F2833; /* Secondary Dark */
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #3B82F6; /* Vibrant Blue */
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #60A5FA; /* Light Blue */
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #4D4D4D; /* Medium Gray */
-  --sidebar-ring: #C5C6C7; /* Light Gray */
-}
+  --background: #070a13;
+  --foreground: #f4f6ff;
+  --destructive: #ff4d5e;
+  --accent: #ff8a1f;
+  --muted-fg: #8a93b2;
 
+  --card: #0e1324;
+  --popover: #151b30;
+  --border: #232a45;
+
+  --primary: #ffc21a;
+  --primary-foreground: #0b0f1e;
+  --secondary: #1b2240;
+  --muted: #151b30;
+  --input: #2a3254;
+  --discord: #5865f2;
+  --electric: #3ee6ff;
+  --glow: #7c5cff;
+  --success: #2ee6a6;
+
+  --iron: #7a6e69;
+  --bronze: #b0653f;
+  --silver: #a7b1c2;
+  --gold: #e8b547;
+  --platinum: #3fc1b4;
+  --emerald: #2bd17e;
+  --diamond: #6a9bff;
+  --master: #b266ff;
+  --grandmaster: #ff4d4d;
+  --challenger: #f7d774;
+}
 
 @layer base {
   * {

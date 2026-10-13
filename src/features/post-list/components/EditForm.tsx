@@ -17,14 +17,12 @@ const EditForm = ({ postId }: { postId: string }) => {
     queryKey: ["post", postId],
     queryFn: () => fetch(`/api/get-post/${postId}`).then((res) => res.json()),
   });
-  const [customFormData, setCustomFormData] = useState<CreatePostFormData>(
-    () => ({
-      description: "",
-      role: null,
-      region: null,
-      rank: null,
-    })
-  );
+  const [customFormData, setCustomFormData] = useState<CreatePostFormData>(() => ({
+    description: "",
+    role: null,
+    region: null,
+    rank: null,
+  }));
 
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -99,30 +97,13 @@ const EditForm = ({ postId }: { postId: string }) => {
           aria-hidden
           value={customFormData.description || ""}
         />
-        <input
-          type="hidden"
-          aria-hidden
-          name="role"
-          value={customFormData.role || ""}
-        />
-        <input
-          aria-hidden
-          type="hidden"
-          name="region"
-          value={customFormData.region || ""}
-        />
-        <input
-          aria-hidden
-          type="hidden"
-          name="rank"
-          value={customFormData.rank || ""}
-        />
+        <input type="hidden" aria-hidden name="role" value={customFormData.role || ""} />
+        <input aria-hidden type="hidden" name="region" value={customFormData.region || ""} />
+        <input aria-hidden type="hidden" name="rank" value={customFormData.rank || ""} />
         {/* <input type="hidden" name="postId" value={postId} /> */}
 
         <SubmitButton />
-        {state?.errors && (
-          <p className="text-red-500">{state.errors.database}</p>
-        )}
+        {state?.errors && <p className="text-red-500">{state.errors.database}</p>}
       </form>
     </FormErrorProvider>
   );

@@ -1,25 +1,25 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from "@/auth/options"
-import { db } from '@/lib/db'
-import { users } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth/options";
+import { db } from "@/lib/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * Get the current authenticated user from the database
  * @returns User object or null if not authenticated
  */
 export async function getCurrentUser() {
-  const session = await getServerSession(authOptions)
-  
+  const session = await getServerSession(authOptions);
+
   if (!session?.user?.email) {
-    return null
+    return null;
   }
 
   const user = await db.query.users.findFirst({
     where: eq(users.email, session.user.email),
-  })
+  });
 
-  return user
+  return user;
 }
 
 /**
@@ -27,8 +27,8 @@ export async function getCurrentUser() {
  * @returns boolean
  */
 export async function isAuthenticated() {
-  const session = await getServerSession(authOptions)
-  return !!session?.user?.email
+  const session = await getServerSession(authOptions);
+  return !!session?.user?.email;
 }
 
 /**
@@ -36,5 +36,5 @@ export async function isAuthenticated() {
  * @returns NextAuth session or null
  */
 export async function getCurrentSession() {
-  return await getServerSession(authOptions)
-} 
+  return await getServerSession(authOptions);
+}

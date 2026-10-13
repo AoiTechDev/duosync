@@ -7,12 +7,7 @@ import { AlertCircle, RefreshCw, Wifi } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import PostSkeleton from "@/components/PostSkeleton";
 import { useFormStore } from "@/store/create-post-store";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import EditForm from "./components/EditForm";
 
 const PostsError = ({
@@ -28,8 +23,7 @@ const PostsError = ({
     if (error.message.includes("fetch")) {
       return {
         title: "Connection Error",
-        description:
-          "Unable to connect to the server. Please check your internet connection.",
+        description: "Unable to connect to the server. Please check your internet connection.",
         icon: <Wifi className="h-5 w-5" />,
       };
     }
@@ -42,8 +36,7 @@ const PostsError = ({
     }
     return {
       title: "Something went wrong",
-      description:
-        error.message || "An unexpected error occurred while loading posts.",
+      description: error.message || "An unexpected error occurred while loading posts.",
       icon: <AlertCircle className="h-5 w-5" />,
     };
   };
@@ -59,16 +52,9 @@ const PostsError = ({
           </div>
           <div>
             <h3 className="font-semibold text-lg mb-1">{errorInfo.title}</h3>
-            <p className="text-muted-foreground text-sm max-w-md">
-              {errorInfo.description}
-            </p>
+            <p className="text-muted-foreground text-sm max-w-md">{errorInfo.description}</p>
           </div>
-          <Button
-            onClick={refetch}
-            disabled={isRefetching}
-            variant="outline"
-            className="mt-2"
-          >
+          <Button onClick={refetch} disabled={isRefetching} variant="outline" className="mt-2">
             {isRefetching ? (
               <>
                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -112,7 +98,7 @@ const Posts = ({ user }: { user: User }) => {
     gcTime: 10 * 60 * 1000,
   });
 
-  console.log(data)
+  console.log(data);
   const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } = useFormStore();
 
   if (isLoading) {
@@ -120,9 +106,7 @@ const Posts = ({ user }: { user: User }) => {
   }
 
   if (isError && error) {
-    return (
-      <PostsError error={error} refetch={refetch} isRefetching={isFetching} />
-    );
+    return <PostsError error={error} refetch={refetch} isRefetching={isFetching} />;
   }
 
   return (
@@ -141,10 +125,7 @@ const Posts = ({ user }: { user: User }) => {
           {data.posts.map((post: PostWithAuthor) => (
             <Post key={post.id} post={post} user={user} />
           ))}
-          <Dialog
-            open={shouldOpenEditDialog}
-            onOpenChange={setShouldOpenEditDialog}
-          >
+          <Dialog open={shouldOpenEditDialog} onOpenChange={setShouldOpenEditDialog}>
             <DialogContent className="sm:max-w-2xl">
               <DialogTitle>Edit your post</DialogTitle>
               <DialogDescription>

@@ -24,7 +24,7 @@ const Form = ({ user }: { user: User }) => {
   const queryClient = useQueryClient();
   const [state, formAction] = useActionState(createPost, undefined);
   const { setShouldOpenCreateDialog } = useFormStore();
-  
+
   useEffect(() => {
     if (state?.success) {
       // Close dialog first to prevent UI flicker
@@ -53,29 +53,19 @@ const Form = ({ user }: { user: User }) => {
         />
         <SelectRegion
           region={customFormData.region}
-          onChange={(region) =>
-            setCustomFormData({ ...customFormData, region: region })
-          }
+          onChange={(region) => setCustomFormData({ ...customFormData, region: region })}
         />
         <SelectRank
           rank={customFormData.rank}
-          onChange={(rank) =>
-            setCustomFormData({ ...customFormData, rank: rank })
-          }
+          onChange={(rank) => setCustomFormData({ ...customFormData, rank: rank })}
         />
 
         <input type="hidden" name="role" value={customFormData.role || ""} />
-        <input
-          type="hidden"
-          name="region"
-          value={customFormData.region || ""}
-        />
+        <input type="hidden" name="region" value={customFormData.region || ""} />
         <input type="hidden" name="rank" value={customFormData.rank || ""} />
 
         <SubmitButton />
-        {state?.errors && (
-          <p className="text-red-500">{state.errors.database}</p>
-        )}
+        {state?.errors && <p className="text-red-500">{state.errors.database}</p>}
       </form>
     </FormErrorProvider>
   );

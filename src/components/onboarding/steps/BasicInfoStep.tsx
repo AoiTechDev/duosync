@@ -33,9 +33,9 @@ export default function BasicInfoStep() {
   const [region, setRegion] = useState(data.region || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [usernameStatus, setUsernameStatus] = useState<
-    "idle" | "checking" | "available" | "taken"
-  >("idle");
+  const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken">(
+    "idle",
+  );
 
   const handleUsernameChange = (value: string) => {
     setUsername(value);
@@ -91,10 +91,7 @@ export default function BasicInfoStep() {
       <div className="space-y-6">
         {/* Username Field */}
         <div className="space-y-3">
-          <Label
-            htmlFor="username"
-            className="text-base font-semibold flex items-center gap-2"
-          >
+          <Label htmlFor="username" className="text-base font-semibold flex items-center gap-2">
             <User className="w-4 h-4" />
             Username
           </Label>
@@ -111,8 +108,8 @@ export default function BasicInfoStep() {
                   error || usernameStatus === "taken"
                     ? "border-destructive focus:border-destructive"
                     : usernameStatus === "available"
-                    ? "border-green-500 focus:border-green-500"
-                    : "border-border focus:border-accent"
+                      ? "border-green-500 focus:border-green-500"
+                      : "border-border focus:border-accent"
                 }
               `}
             />
@@ -125,9 +122,7 @@ export default function BasicInfoStep() {
               {usernameStatus === "available" && (
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
               )}
-              {usernameStatus === "taken" && (
-                <AlertCircle className="w-5 h-5 text-destructive" />
-              )}
+              {usernameStatus === "taken" && <AlertCircle className="w-5 h-5 text-destructive" />}
             </div>
           </div>
 
@@ -147,8 +142,7 @@ export default function BasicInfoStep() {
             )}
             {!error && usernameStatus !== "available" && (
               <p className="text-muted-foreground text-sm">
-                This will be visible to other players when looking for duo
-                partners
+                This will be visible to other players when looking for duo partners
               </p>
             )}
           </div>
@@ -156,10 +150,7 @@ export default function BasicInfoStep() {
 
         {/* Region Field */}
         <div className="space-y-3">
-          <Label
-            htmlFor="region"
-            className="text-base font-semibold flex items-center gap-2"
-          >
+          <Label htmlFor="region" className="text-base font-semibold flex items-center gap-2">
             <Globe className="w-4 h-4" />
             Region
           </Label>
@@ -203,4 +194,4 @@ export default function BasicInfoStep() {
       </div>
     </div>
   );
-} 
+}

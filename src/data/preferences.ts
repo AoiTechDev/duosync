@@ -354,4 +354,3 @@ export const RANKS: RankOption[] = [
     color: "from-gray-500 to-slate-500",
   },
 ];
-

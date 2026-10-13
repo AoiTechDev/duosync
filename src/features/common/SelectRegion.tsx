@@ -32,17 +32,11 @@ const SelectRegion = ({
   const error = useFieldError("region");
   return (
     <div className="space-y-2">
-      <Label
-        htmlFor="region"
-        className="text-base font-semibold flex items-center gap-2"
-      >
+      <Label htmlFor="region" className="text-base font-semibold flex items-center gap-2">
         <Globe className="w-4 h-4" />
         Region
       </Label>
-      <Select
-        value={region ?? ""}
-        onValueChange={(value) => onChange(value as Region)}
-      >
+      <Select value={region ?? ""} onValueChange={(value) => onChange(value as Region)}>
         <SelectTrigger className="h-12 text-base">
           <SelectValue placeholder="Select your region" />
         </SelectTrigger>

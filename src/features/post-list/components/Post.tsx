@@ -20,17 +20,12 @@ import { sendFriendRequest } from "@/features/friends/api";
 import { formatRelativeTime, stripRankName } from "@/lib/utils";
 
 const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
-
-
   const isOwner = user?.id === post.author.id;
 
   const { setPostId, setShouldOpenEditDialog } = useFormStore();
 
   return (
-    <Card
-      key={post.id}
-      className="group max-w-2xl mx-auto  border border-border/30  bg-card"
-    >
+    <Card key={post.id} className="group max-w-2xl mx-auto  border border-border/30  bg-card">
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">
           <div className="relative">
@@ -46,17 +41,17 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
           </div>
           <div className="flex-1 relative">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="font-bold text-lg text-foreground ">
-                {post.author.username}
-              </h3>
-              <Badge
-                className={` text-white text-xs px-3 py-1 font-semibold shadow-md`}
-              >
+              <h3 className="font-bold text-lg text-foreground ">{post.author.username}</h3>
+              <Badge className={` text-white text-xs px-3 py-1 font-semibold shadow-md`}>
                 {post.author.mainRole}
               </Badge>
               {post.author.soloRank && (
-
-                <Image src={`/ranks/${stripRankName(post.author.soloRank)}.png`} width={50} height={50} alt="rank" />
+                <Image
+                  src={`/ranks/${stripRankName(post.author.soloRank)}.png`}
+                  width={50}
+                  height={50}
+                  alt="rank"
+                />
               )}
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -91,9 +86,7 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
       </CardHeader>
 
       <CardContent className="pt-0 space-y-4">
-        <p className="text-foreground leading-relaxed text-base font-medium">
-          {post.description}
-        </p>
+        <p className="text-foreground leading-relaxed text-base font-medium">{post.description}</p>
 
         <div className="bg-gradient-to-r from-muted/20 to-muted/10 rounded-xl p-4 border border-border/20">
           <div className="flex items-center gap-2 mb-3">
@@ -101,9 +94,7 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <div
-                className={`w-8 h-8 rounded-lg flex items-center justify-center`}
-              >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center`}>
                 <Image
                   src={ROLES.find((r) => r.id === post.role)?.icon || ""}
                   alt={post.author.mainRole || ""}
@@ -114,9 +105,7 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
               <span className="font-semibold text-foreground">{post.role}</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
-              <div
-                className={`w-8 h-8 rounded-lg flex items-center justify-center`}
-              >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center`}>
                 <Image
                   src={RANKS.find((r) => r.id === post.rank)?.icon || ""}
                   alt={post.rank || ""}
@@ -146,7 +135,7 @@ const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
                     const result = await sendFriendRequest(post.author.id);
 
                     console.log(result);
-                  } catch { }
+                  } catch {}
                 }}
               >
                 <UserPlus className="h-4 w-4 mr-1" />

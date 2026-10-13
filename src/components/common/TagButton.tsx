@@ -26,8 +26,8 @@ export function TagButton({
             selected
               ? "bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20"
               : disabled
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"
           }
         `}
     >

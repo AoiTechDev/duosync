@@ -21,9 +21,9 @@ export default function RiotAccountStep() {
   const [gameName, setGameName] = useState(data.gameName || "");
   const [tagLine, setTagLine] = useState(data.tagLine || "");
   const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [verificationStatus, setVerificationStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
   const [rankData, setRankData] = useState<RankData | null>(null);
   const [error, setError] = useState("");
 
@@ -112,9 +112,7 @@ export default function RiotAccountStep() {
               className={error ? "border-red-500" : ""}
             />
             <div className="flex items-center gap-2">
-              <div className="flex items-center text-lg font-bold text-gray-400">
-                #
-              </div>
+              <div className="flex items-center text-lg font-bold text-gray-400">#</div>
               <Input
                 id="tagLine"
                 value={tagLine}
@@ -133,19 +131,15 @@ export default function RiotAccountStep() {
                 variant="outline"
                 className="min-w-[100px]"
               >
-                {isVerifying ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Verify"
-                )}
+                {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify"}
               </Button>
             </div>
           </div>
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           {!error && (
             <p className="text-gray-500 text-sm mt-1">
-              Enter your Riot ID (e.g., GameName#TAG1). You can find this in
-              your Riot Games account.
+              Enter your Riot ID (e.g., GameName#TAG1). You can find this in your Riot Games
+              account.
             </p>
           )}
         </div>
@@ -155,9 +149,7 @@ export default function RiotAccountStep() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-8 h-8 text-red-500" />
               <div>
-                <h3 className="font-semibold text-red-800">
-                  Verification Failed
-                </h3>
+                <h3 className="font-semibold text-red-800">Verification Failed</h3>
                 <p className="text-red-700">{error}</p>
               </div>
             </div>
@@ -174,10 +166,7 @@ export default function RiotAccountStep() {
           <Button variant="ghost" onClick={handleSkip}>
             Skip for now
           </Button>
-          <Button
-            onClick={handleNext}
-            disabled={verificationStatus !== "success"}
-          >
+          <Button onClick={handleNext} disabled={verificationStatus !== "success"}>
             Continue
           </Button>
         </div>

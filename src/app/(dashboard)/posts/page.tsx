@@ -7,7 +7,6 @@ import PostsList from "@/features/post-list/Posts";
 export default async function PostPage() {
   const user = await getCurrentUser();
 
-
   if (!user) {
     redirect("/login");
   }
@@ -19,7 +18,7 @@ export default async function PostPage() {
   return (
     <div className="container mx-auto py-8 max-w-3xl">
       <CreatePost user={user} />
-      <PostsList user={user}/>
+      <PostsList user={user} />
     </div>
   );
 }

@@ -18,7 +18,7 @@ export type User = typeof schema.users.$inferSelect;
 export type NewUser = typeof schema.users.$inferInsert;
 export type Post = typeof schema.posts.$inferSelect;
 export type NewPost = typeof schema.posts.$inferInsert;
-// export type Message = typeof schema.messages.$inferSelect; 
+// export type Message = typeof schema.messages.$inferSelect;
 export type Friendship = typeof schema.friendships.$inferSelect;
 
 export type PostWithAuthor = {

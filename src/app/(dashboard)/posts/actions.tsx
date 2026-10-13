@@ -14,7 +14,7 @@ interface CreatePostState {
 
 export async function createPost(
   prevState: CreatePostState | undefined,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreatePostState> {
   const validatedFields = createPostValidator.safeParse({
     description: formData.get("description"),
@@ -64,10 +64,10 @@ export async function createPost(
 
 export async function editPost(
   prevState: CreatePostState | undefined,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreatePostState> {
   const postId = formData.get("postId") as string;
-  
+
   if (!postId) {
     return {
       errors: {
@@ -102,7 +102,8 @@ export async function editPost(
   }
 
   try {
-    await db.update(posts)
+    await db
+      .update(posts)
       .set({
         description: validatedFields.data.description,
         rank: validatedFields.data.rank,

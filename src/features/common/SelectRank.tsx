@@ -26,37 +26,21 @@ const ranks = [
   { value: "CHALLENGER", label: "Challenger", image: "/ranks/CHALLANGER.png" },
 ];
 
-const SelectRank = ({
-  rank,
-  onChange,
-}: {
-  rank: Rank | null;
-  onChange: (rank: Rank) => void;
-}) => {
+const SelectRank = ({ rank, onChange }: { rank: Rank | null; onChange: (rank: Rank) => void }) => {
   const error = useFieldError("rank");
-  
+
   return (
     <div className="space-y-2">
-      <Label
-        htmlFor="rank"
-        className="text-base font-semibold flex items-center gap-2"
-      >
+      <Label htmlFor="rank" className="text-base font-semibold flex items-center gap-2">
         What rank you are looking for?
       </Label>
-      <Select
-        value={rank ?? ""}
-        onValueChange={(value) => onChange(value as Rank)}
-      >
+      <Select value={rank ?? ""} onValueChange={(value) => onChange(value as Rank)}>
         <SelectTrigger className="h-12 text-base">
           <SelectValue placeholder="Select rank" />
         </SelectTrigger>
         <SelectContent>
           {ranks.map((rank) => (
-            <SelectItem
-              key={rank.value}
-              value={rank.value}
-              className="text-base"
-            >
+            <SelectItem key={rank.value} value={rank.value} className="text-base">
               <div className="flex items-center gap-3">
                 <Image
                   src={rank.image}

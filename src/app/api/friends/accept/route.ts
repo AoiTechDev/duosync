@@ -20,10 +20,7 @@ export async function POST(request: Request) {
     const parse = BodySchema.safeParse(json);
 
     if (!parse.success) {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
     const { requestId } = parse.data;
@@ -33,10 +30,7 @@ export async function POST(request: Request) {
     });
 
     if (!fr) {
-      return NextResponse.json(
-        { error: "Friend request not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Friend request not found" }, { status: 404 });
     }
 
     if (fr.receiverId !== me.id) {
@@ -53,8 +47,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const [a, b] =
-      me.id < fr.receiverId ? [me.id, fr.receiverId] : [fr.receiverId, me.id];
+    const [a, b] = me.id < fr.receiverId ? [me.id, fr.receiverId] : [fr.receiverId, me.id];
     const existingFriendship = await db.query.friendships.findFirst({
       where: and(eq(friendships.userAId, a), eq(friendships.userBId, b)),
     });
@@ -68,12 +61,7 @@ export async function POST(request: Request) {
         .set({
           status: "ACCEPTED",
         })
-        .where(
-          and(
-            eq(friendRequests.id, requestId),
-            eq(friendRequests.status, "PENDING"),
-          ),
-        );
+        .where(and(eq(friendRequests.id, requestId), eq(friendRequests.status, "PENDING")));
 
       await tx
         .insert(friendships)

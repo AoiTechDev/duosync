@@ -15,14 +15,7 @@ import { relations } from "drizzle-orm";
 import type { AdapterAccount } from "next-auth/adapters";
 import { regions } from "@/data/constants";
 
-export const roleEnum = pgEnum("role", [
-  "TOP",
-  "JUNGLE",
-  "MID",
-  "ADC",
-  "SUPPORT",
-  "FILL",
-]);
+export const roleEnum = pgEnum("role", ["TOP", "JUNGLE", "MID", "ADC", "SUPPORT", "FILL"]);
 
 export type Role = (typeof roleEnum.enumValues)[number];
 
@@ -77,12 +70,7 @@ export type RankMin = (typeof rankMinEnum.enumValues)[number];
 export const regionEnum = pgEnum("region", regions as [string, ...string[]]);
 export type Region = (typeof regionEnum.enumValues)[number];
 
-export const gameModeEnum = pgEnum("game_mode", [
-  "RANKED_SOLO",
-  "RANKED_FLEX",
-  "NORMAL",
-  "ARAM",
-]);
+export const gameModeEnum = pgEnum("game_mode", ["RANKED_SOLO", "RANKED_FLEX", "NORMAL", "ARAM"]);
 
 export const friendshipStatusEnum = pgEnum("friendship_status", [
   "PENDING",
@@ -142,7 +130,7 @@ export const accounts = pgTable(
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-  })
+  }),
 );
 
 export const sessions = pgTable("sessions", {
@@ -162,7 +150,7 @@ export const verificationTokens = pgTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
+  }),
 );
 
 export const posts = pgTable("posts", {
@@ -197,7 +185,7 @@ export const friendships = pgTable(
     uniqueFriendship: unique().on(table.userAId, table.userBId),
     userAIdx: index().on(table.userAId),
     userBIdx: index().on(table.userBId),
-  })
+  }),
 );
 
 export const friendRequests = pgTable(
@@ -216,7 +204,7 @@ export const friendRequests = pgTable(
   (table) => ({
     inboundIdx: index().on(table.receiverId, table.status),
     outboundIdx: index().on(table.senderId, table.status),
-  })
+  }),
 );
 
 // Relations

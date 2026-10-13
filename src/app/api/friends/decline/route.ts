@@ -20,10 +20,7 @@ export async function POST(request: Request) {
     const parse = BodySchema.safeParse(json);
 
     if (!parse.success) {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
     const { requestId } = parse.data;
@@ -33,10 +30,7 @@ export async function POST(request: Request) {
     });
 
     if (!fr) {
-      return NextResponse.json(
-        { error: "Friend request not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Friend request not found" }, { status: 404 });
     }
 
     if (fr.receiverId !== me.id) {

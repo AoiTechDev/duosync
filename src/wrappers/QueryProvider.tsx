@@ -26,9 +26,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             // Exponential backoff for retries
             retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
             // Don't refetch on window focus in development
-            refetchOnWindowFocus: process.env.NODE_ENV === 'production',
+            refetchOnWindowFocus: process.env.NODE_ENV === "production",
             // Don't refetch on reconnect aggressively
-            refetchOnReconnect: 'always',
+            refetchOnReconnect: "always",
           },
           mutations: {
             // Retry mutations once on network errors
@@ -40,10 +40,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             },
           },
         },
-      })
+      }),
   );
 
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

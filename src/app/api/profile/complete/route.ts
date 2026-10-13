@@ -33,15 +33,9 @@ export async function POST(request: NextRequest) {
             ? null
             : profileData.flexRank,
         mainRole: profileData.mainRole ? profileData.mainRole.toUpperCase() : null,
-        secondaryRole: profileData.secondaryRole
-          ? profileData.secondaryRole.toUpperCase()
-          : null,
-        playstyle: Array.isArray(profileData.playstyleTags)
-          ? profileData.playstyleTags
-          : [],
-        communication: Array.isArray(profileData.communication)
-          ? profileData.communication
-          : [],
+        secondaryRole: profileData.secondaryRole ? profileData.secondaryRole.toUpperCase() : null,
+        playstyle: Array.isArray(profileData.playstyleTags) ? profileData.playstyleTags : [],
+        communication: Array.isArray(profileData.communication) ? profileData.communication : [],
         goals: Array.isArray(profileData.goals) ? profileData.goals : [],
         bio: profileData.bio || "",
         updatedAt: new Date(),
@@ -51,9 +45,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Profile completion error:", error);
-    return NextResponse.json(
-      { error: "Failed to complete profile" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to complete profile" }, { status: 500 });
   }
 }

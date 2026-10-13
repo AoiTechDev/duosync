@@ -8,12 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { signOutAction } from "@/app/actions/auth";
-import { 
-  User, 
-  Mail, 
-  MapPin, 
-  Gamepad2, 
-  Trophy, 
+import {
+  User,
+  Mail,
+  MapPin,
+  Gamepad2,
+  Trophy,
   Settings,
   Edit3,
   AlertCircle,
@@ -21,7 +21,7 @@ import {
   Loader2,
   MessageSquare,
   Target,
-  Swords
+  Swords,
 } from "lucide-react";
 import Image from "next/image";
 import { ROLES, GOALS, PLAYSTYLE_TAGS, COMMUNICATION_PREFERENCES } from "@/data/preferences";
@@ -102,7 +102,7 @@ function RiotVerificationSection({ user }: { user: User }) {
       });
 
       const result = await response.json();
-     
+
       if (result.success) {
         setSuccess(true);
         setError("");
@@ -155,7 +155,7 @@ function RiotVerificationSection({ user }: { user: User }) {
         <p className="text-sm text-orange-700">
           Connect your League of Legends account to verify your rank and show your gaming profile.
         </p>
-        
+
         {success ? (
           <div className="flex items-center gap-2 text-green-700">
             <CheckCircle2 className="w-5 h-5" />
@@ -190,11 +190,7 @@ function RiotVerificationSection({ user }: { user: User }) {
                   disabled={!gameName.trim() || !tagLine.trim() || isVerifying}
                   className="min-w-[100px]"
                 >
-                  {isVerifying ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Verify"
-                  )}
+                  {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify"}
                 </Button>
               </div>
             </div>
@@ -211,25 +207,31 @@ function RiotVerificationSection({ user }: { user: User }) {
   );
 }
 
-function PreferenceBadge({ preference, type }: { preference: string; type: 'role' | 'goal' | 'playstyle' | 'communication' }) {
+function PreferenceBadge({
+  preference,
+  type,
+}: {
+  preference: string;
+  type: "role" | "goal" | "playstyle" | "communication";
+}) {
   let data: { id: string; name: string; icon?: string } | undefined = undefined;
   let icon = null;
 
   switch (type) {
-    case 'role':
-      data = ROLES.find(r => r.id === preference);
+    case "role":
+      data = ROLES.find((r) => r.id === preference);
       if (data?.icon) {
         icon = <Image src={data.icon} alt={data.name} width={16} height={16} />;
       }
       break;
-    case 'goal':
-      data = GOALS.find(g => g.id === preference);
+    case "goal":
+      data = GOALS.find((g) => g.id === preference);
       break;
-    case 'playstyle':
-      data = PLAYSTYLE_TAGS.find(p => p.id === preference);
+    case "playstyle":
+      data = PLAYSTYLE_TAGS.find((p) => p.id === preference);
       break;
-    case 'communication':
-      data = COMMUNICATION_PREFERENCES.find(c => c.id === preference);
+    case "communication":
+      data = COMMUNICATION_PREFERENCES.find((c) => c.id === preference);
       break;
   }
 
@@ -244,16 +246,17 @@ function PreferenceBadge({ preference, type }: { preference: string; type: 'role
 }
 
 export function ProfilePageClient({ user }: ProfilePageClientProps) {
-  const regionData = regions.find(r => r.value === user.region);
-  const memberSince = user.createdAt ? user.createdAt.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long' 
-  }) : "Unknown";
+  const regionData = regions.find((r) => r.value === user.region);
+  const memberSince = user.createdAt
+    ? user.createdAt.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+      })
+    : "Unknown";
 
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
-        
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Profile</h1>
@@ -275,9 +278,7 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
         <RiotVerificationSection user={user} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
           <div className="lg:col-span-1 space-y-6">
-            
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -295,20 +296,18 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
                   </Avatar>
                   <div>
                     <h3 className="font-semibold text-lg">{user.username}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Member since {memberSince}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Member since {memberSince}</p>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
                     <span>{user.email}</span>
                   </div>
-                  
+
                   {user.region && (
                     <div className="flex items-center gap-2 text-sm">
                       <MapPin className="w-4 h-4 text-muted-foreground" />
@@ -316,7 +315,7 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
                       <span>{regionData?.label || user.region}</span>
                     </div>
                   )}
-                  
+
                   {user.name && (
                     <div className="flex items-center gap-2 text-sm">
                       <User className="w-4 h-4 text-muted-foreground" />
@@ -354,7 +353,7 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
                       </div>
                     </div>
                   )}
-                  
+
                   {user.flexRank && (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -379,7 +378,6 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
           </div>
 
           <div className="lg:col-span-2 space-y-6">
-            
             {(user.mainRole || user.secondaryRole) && (
               <Card>
                 <CardHeader>
@@ -393,13 +391,17 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
                     {user.mainRole && (
                       <div className="flex items-center gap-2">
                         <PreferenceBadge preference={user.mainRole} type="role" />
-                        <Badge variant="outline" className="text-xs">Primary</Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Primary
+                        </Badge>
                       </div>
                     )}
                     {user.secondaryRole && (
                       <div className="flex items-center gap-2">
                         <PreferenceBadge preference={user.secondaryRole} type="role" />
-                        <Badge variant="outline" className="text-xs">Secondary</Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Secondary
+                        </Badge>
                       </div>
                     )}
                   </div>
@@ -475,25 +477,26 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
               </Card>
             )}
 
-            {(!user.goals || user.goals.length === 0) && 
-             (!user.communication || user.communication.length === 0) && 
-             (!user.playstyle || user.playstyle.length === 0) && (
-              <Card className="border-dashed border-2 border-muted">
-                <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Settings className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-semibold text-lg mb-2">Complete Your Profile</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Add your gaming preferences to help others find you as the perfect duo partner!
-                    </p>
-                    <Button variant="outline">
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      Complete Profile Setup
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {(!user.goals || user.goals.length === 0) &&
+              (!user.communication || user.communication.length === 0) &&
+              (!user.playstyle || user.playstyle.length === 0) && (
+                <Card className="border-dashed border-2 border-muted">
+                  <CardContent className="pt-6">
+                    <div className="text-center py-8">
+                      <Settings className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="font-semibold text-lg mb-2">Complete Your Profile</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Add your gaming preferences to help others find you as the perfect duo
+                        partner!
+                      </p>
+                      <Button variant="outline">
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Complete Profile Setup
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>

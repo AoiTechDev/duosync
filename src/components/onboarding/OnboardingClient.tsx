@@ -6,7 +6,7 @@ import RiotAccountStep from "./steps/RiotAccountStep";
 import PreferencesStep from "./steps/PreferencesStep";
 
 export default function OnboardingClient() {
-  const currentStep = useOnboardingStore(state => state.currentStep);
+  const currentStep = useOnboardingStore((state) => state.currentStep);
 
   const renderStep = () => {
     switch (currentStep) {

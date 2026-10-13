@@ -13,7 +13,6 @@ export async function GET() {
       where: or(eq(friendships.userAId, me.id), eq(friendships.userBId, me.id)),
     });
 
-
     const postsResponse = await db
       .select({
         id: posts.id,
@@ -44,13 +43,9 @@ export async function GET() {
       .where(eq(posts.isActive, true))
       .orderBy(desc(posts.createdAt));
 
-      
     return NextResponse.json({ posts: postsResponse, friend: friend });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

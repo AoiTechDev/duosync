@@ -28,9 +28,7 @@ export function ServerUserDropdown({ user }: ServerUserDropdownProps) {
         <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           {/* User Display Name */}
           <div className="hidden sm:flex flex-col items-end">
-            <span className="text-sm font-medium text-foreground">
-              {getUserDisplayName(user)}
-            </span>
+            <span className="text-sm font-medium text-foreground">{getUserDisplayName(user)}</span>
           </div>
 
           {/* User Avatar */}
@@ -48,12 +46,8 @@ export function ServerUserDropdown({ user }: ServerUserDropdownProps) {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {getUserDisplayName(user)}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
-            </p>
+            <p className="text-sm font-medium leading-none">{getUserDisplayName(user)}</p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

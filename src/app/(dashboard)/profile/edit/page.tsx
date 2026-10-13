@@ -86,9 +86,7 @@ export default async function EditProfilePage() {
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit">
-                  Save Changes
-                </Button>
+                <Button type="submit">Save Changes</Button>
                 <a href="/profile">
                   <Button type="button" variant="outline">
                     Cancel
@@ -101,4 +99,4 @@ export default async function EditProfilePage() {
       </div>
     </div>
   );
-} 
+}

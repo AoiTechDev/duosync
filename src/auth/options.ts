@@ -65,10 +65,7 @@ export const authOptions: NextAuthOptions = {
         if (dbUser.length > 0) {
           session.user.id = dbUser[0].id;
           session.user.username =
-            dbUser[0].username ||
-            dbUser[0].name ||
-            dbUser[0].email?.split("@")[0] ||
-            "";
+            dbUser[0].username || dbUser[0].name || dbUser[0].email?.split("@")[0] || "";
         }
       }
       return session;

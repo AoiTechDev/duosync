@@ -15,7 +15,14 @@ const FriendsDropdown = () => {
         cache: "no-store",
       });
       if (!res.ok) throw new Error("Failed to load requests");
-      return res.json() as Promise<{ items: { id: string; createdAt: string; status: string; otherUser: { id: string; username: string | null; image: string | null } }[] }>;
+      return res.json() as Promise<{
+        items: {
+          id: string;
+          createdAt: string;
+          status: string;
+          otherUser: { id: string; username: string | null; image: string | null };
+        }[];
+      }>;
     },
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
@@ -44,7 +51,6 @@ const FriendsDropdown = () => {
     },
   });
 
-
   const items = data?.items ?? [];
 
   return (
@@ -66,34 +72,48 @@ const FriendsDropdown = () => {
             </div>
           ) : isError ? (
             <div className="p-4 text-sm text-red-600">
-              Failed to load. <button className="underline" onClick={() => refetch()}>Retry</button>
+              Failed to load.{" "}
+              <button className="underline" onClick={() => refetch()}>
+                Retry
+              </button>
             </div>
           ) : items.length === 0 ? (
             <div className="p-4 text-sm text-muted-foreground">No pending requests</div>
           ) : (
             <ul className="divide-y">
               {items.map((r) => (
-
                 <li key={r.id} className="p-3 flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={r.otherUser.image || undefined} />
-                    <AvatarFallback>{r.otherUser.username?.slice(0, 2)?.toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>
+                      {r.otherUser.username?.slice(0, 2)?.toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{r.otherUser.username ?? "Unknown"}</div>
+                    <div className="text-sm font-medium truncate">
+                      {r.otherUser.username ?? "Unknown"}
+                    </div>
                     <div className="text-xs text-muted-foreground">sent a friend request</div>
                   </div>
 
-
                   <div className="space-x-2">
-
-                    <Button size="icon" variant="default" onClick={() => acceptMutation.mutate(r.id)}>{acceptMutation.isPending ? <Loader2 /> : <Check />}</Button>
-                    <Button size="icon" variant="outline" onClick={() => {
-                      console.log(r.id)
-                      declineMutation.mutate(r.id)
-
-                    }}>{declineMutation.isPending ? <Loader2 className="anima" /> : <X />}</Button>
-
+                    <Button
+                      size="icon"
+                      variant="default"
+                      onClick={() => acceptMutation.mutate(r.id)}
+                    >
+                      {acceptMutation.isPending ? <Loader2 /> : <Check />}
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => {
+                        console.log(r.id);
+                        declineMutation.mutate(r.id);
+                      }}
+                    >
+                      {declineMutation.isPending ? <Loader2 className="anima" /> : <X />}
+                    </Button>
                   </div>
                 </li>
               ))}
@@ -101,7 +121,9 @@ const FriendsDropdown = () => {
           )}
         </div>
         <div className="p-2 border-t text-right">
-          <Button size="sm" variant="ghost" onClick={() => refetch()}>Refresh</Button>
+          <Button size="sm" variant="ghost" onClick={() => refetch()}>
+            Refresh
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

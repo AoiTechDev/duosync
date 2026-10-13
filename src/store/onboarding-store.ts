@@ -104,11 +104,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
       name: "duosync-onboarding",
       migrate: (persistedState: unknown, version: number) => {
         // Clean up old rank fields from persisted data
-        if (
-          persistedState &&
-          typeof persistedState === "object" &&
-          "data" in persistedState
-        ) {
+        if (persistedState && typeof persistedState === "object" && "data" in persistedState) {
           const state = persistedState as { data: Record<string, unknown> };
           const { currentRank, peakRank, ...cleanData } = state.data;
           return {
@@ -118,6 +114,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
         }
         return persistedState;
       },
-    }
-  )
+    },
+  ),
 );

@@ -16,44 +16,42 @@ src/auth/
 ## 📦 Usage
 
 ### Import from the main module
+
 ```typescript
 // ✅ Clean imports from the main auth module
-import { 
-  getCurrentUser, 
-  getUserDisplayName, 
-  getUserInitials,
-  type AuthUser 
-} from '@/auth'
+import { getCurrentUser, getUserDisplayName, getUserInitials, type AuthUser } from "@/auth";
 
 // ❌ Don't import directly from submodules
-import { getCurrentUser } from '@/auth/server' // Avoid this
+import { getCurrentUser } from "@/auth/server"; // Avoid this
 ```
 
 ### Server Components
+
 ```typescript
 import { getCurrentUser, isAuthenticated } from '@/auth'
 
 export default async function MyPage() {
   const user = await getCurrentUser()
   const isAuth = await isAuthenticated()
-  
+
   if (!isAuth) {
     return <div>Please sign in</div>
   }
-  
+
   return <div>Welcome {getUserDisplayName(user)}</div>
 }
 ```
 
 ### Utilities
+
 ```typescript
-import { getUserInitials, getFormattedRank } from '@/auth'
+import { getUserInitials, getFormattedRank } from "@/auth";
 
 // Get user initials for avatar fallback
-const initials = getUserInitials(user.name, user.username)
+const initials = getUserInitials(user.name, user.username);
 
 // Format rank for display
-const rank = getFormattedRank(user.soloRank) // "GOLD IV" instead of "GOLD_IV"
+const rank = getFormattedRank(user.soloRank); // "GOLD IV" instead of "GOLD_IV"
 ```
 
 ## 🎯 Benefits
@@ -63,4 +61,4 @@ const rank = getFormattedRank(user.soloRank) // "GOLD IV" instead of "GOLD_IV"
 - **Type safety** with `AuthUser` interface
 - **Reusable utilities** across components
 - **Server-side optimized** functions
-- **Well documented** with JSDoc comments 
+- **Well documented** with JSDoc comments

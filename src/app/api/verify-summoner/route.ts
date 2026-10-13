@@ -55,12 +55,8 @@ const APEX_TIERS = ["MASTER", "GRANDMASTER", "CHALLENGER"];
 // but are stored without a division.
 function toRank(entry: RankedEntry | undefined): Rank | null {
   if (!entry) return null;
-  const value = APEX_TIERS.includes(entry.tier)
-    ? entry.tier
-    : `${entry.tier}_${entry.rank}`;
-  return (rankEnum.enumValues as readonly string[]).includes(value)
-    ? (value as Rank)
-    : null;
+  const value = APEX_TIERS.includes(entry.tier) ? entry.tier : `${entry.tier}_${entry.rank}`;
+  return (rankEnum.enumValues as readonly string[]).includes(value) ? (value as Rank) : null;
 }
 
 export async function POST(request: NextRequest) {
@@ -80,16 +76,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const regionalEndpoint =
-      REGIONAL_ENDPOINTS[region as keyof typeof REGIONAL_ENDPOINTS];
-    const platformEndpoint =
-      REGION_ENDPOINTS[region as keyof typeof REGION_ENDPOINTS];
+    const regionalEndpoint = REGIONAL_ENDPOINTS[region as keyof typeof REGIONAL_ENDPOINTS];
+    const platformEndpoint = REGION_ENDPOINTS[region as keyof typeof REGION_ENDPOINTS];
 
     if (!regionalEndpoint || !platformEndpoint) {
-      return NextResponse.json(
-        { success: false, message: "Invalid region" },
-        { status: 400 },
-      );
+      return NextResponse.json({ success: false, message: "Invalid region" }, { status: 400 });
     }
 
     // Get account by riot ID (gameName#tagLine)
@@ -134,12 +125,8 @@ export async function POST(request: NextRequest) {
     if (rankedResponse.ok) {
       const rankedData: RankedEntry[] = await rankedResponse.json();
 
-      soloRank = toRank(
-        rankedData.find((entry) => entry.queueType === "RANKED_SOLO_5x5"),
-      );
-      flexRank = toRank(
-        rankedData.find((entry) => entry.queueType === "RANKED_FLEX_SR"),
-      );
+      soloRank = toRank(rankedData.find((entry) => entry.queueType === "RANKED_SOLO_5x5"));
+      flexRank = toRank(rankedData.find((entry) => entry.queueType === "RANKED_FLEX_SR"));
     }
 
     await db

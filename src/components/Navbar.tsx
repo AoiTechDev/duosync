@@ -12,17 +12,12 @@ export default async function Navbar() {
       <div className="flex items-center justify-between h-full">
         {/* Logo */}
         <div className="h-10 w-10 relative">
-          <Image 
-            src="/logo.jpeg" 
-            alt="DuoSync logo" 
-            fill 
-            className="object-cover rounded-md" 
-          />
+          <Image src="/logo.jpeg" alt="DuoSync logo" fill className="object-cover rounded-md" />
         </div>
 
         {/* User Section */}
         <div className="flex items-center gap-3">
-          <FriendsDropdown/>
+          <FriendsDropdown />
           {user ? (
             <ServerUserDropdown user={user} />
           ) : (
@@ -37,4 +32,4 @@ export default async function Navbar() {
       </div>
     </div>
   );
-} 
+}
