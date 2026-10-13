@@ -1,4 +1,5 @@
 "use client";
+import { sanitizeUsernameInput } from "@/lib/username";
 import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, X } from "lucide-react";
 import { useOnboardingStore } from "@/store/onboarding-store";
@@ -44,7 +45,8 @@ export default function BasicInfoStep() {
     }
   };
 
-  const handleChange = (value: string) => {
+  const handleChange = (raw: string) => {
+    const value = sanitizeUsernameInput(raw);
     setUsername(value);
     latest.current = value;
     setStatus("idle");

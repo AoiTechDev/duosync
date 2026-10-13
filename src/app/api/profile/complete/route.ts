@@ -1,44 +1,53 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth/options";
+import { NextResponse } from "next/server";
+import { and, eq, ne } from "drizzle-orm";
+import { getCurrentUser } from "@/auth";
+import { isProfileComplete } from "@/auth/utils";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { completeProfileSchema } from "@/validators/profile-validator";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
+    const me = await getCurrentUser();
+    if (!me) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
+    if (isProfileComplete(me)) {
+      return NextResponse.json({ error: "Profile is already set up" }, { status: 409 });
+    }
 
-    const profileData = await request.json();
+    const parsed = completeProfileSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid profile data", fields: parsed.error.issues.map((i) => i.path.join(".")) },
+        { status: 400 },
+      );
+    }
+    const data = parsed.data;
 
-    console.log("Profile data:", profileData);
+    const [taken] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.username, data.username), ne(users.id, me.id)))
+      .limit(1);
+    if (taken) {
+      return NextResponse.json({ error: "Username is already taken" }, { status: 409 });
+    }
+
     await db
       .update(users)
       .set({
-        username: profileData.username?.toLowerCase(),
-        region: profileData.region || null,
-        summonerName: profileData.summonerName || null,
-        soloRank:
-          profileData.soloRank === "UNRANKED" || !profileData.soloRank
-            ? null
-            : profileData.soloRank,
-        flexRank:
-          profileData.flexRank === "UNRANKED" || !profileData.flexRank
-            ? null
-            : profileData.flexRank,
-        mainRole: profileData.mainRole ? profileData.mainRole.toUpperCase() : null,
-        secondaryRole: profileData.secondaryRole ? profileData.secondaryRole.toUpperCase() : null,
-        playstyle: Array.isArray(profileData.playstyleTags) ? profileData.playstyleTags : [],
-        communication: Array.isArray(profileData.communication) ? profileData.communication : [],
-        goals: Array.isArray(profileData.goals) ? profileData.goals : [],
-        bio: profileData.bio || "",
+        username: data.username,
+        region: data.region,
+        mainRole: data.mainRole,
+        secondaryRole: data.secondaryRole ?? null,
+        playstyle: data.playstyleTags,
+        communication: data.communication,
+        goals: data.goals,
+        bio: data.bio,
         updatedAt: new Date(),
       })
-      .where(eq(users.email, session.user.email));
+      .where(eq(users.id, me.id));
 
     return NextResponse.json({ success: true });
   } catch (error) {

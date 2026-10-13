@@ -13,6 +13,7 @@ import {
 } from "./schema";
 
 const EMAIL_DOMAIN = "@seed.duosync.test";
+const toUsername = (name: string) => name.toLowerCase();
 const PLAYERS = 40;
 const POSTS = 300;
 
@@ -70,13 +71,14 @@ async function seed() {
   const players = await db
     .insert(users)
     .values(
-      NAMES.slice(0, PLAYERS).map((username, i) => {
+      NAMES.slice(0, PLAYERS).map((displayName, i) => {
+        const username = toUsername(displayName);
         const main = pick(LANES);
         const region = pick(REGIONS);
         return {
           email: `${username.toLowerCase()}${EMAIL_DOMAIN}`,
           username,
-          summonerName: `${username}#${TAGS[region]}`,
+          summonerName: `${displayName}#${TAGS[region]}`,
           region,
           soloRank: pick(rankEnum.enumValues),
           flexRank: Math.random() < 0.5 ? pick(rankEnum.enumValues) : null,

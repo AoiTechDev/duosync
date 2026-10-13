@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import z from "zod";
 import { friendRequests } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 const BodySchema = z.object({
   requestId: z.string().uuid(),
 });
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     if (fr.receiverId !== me.id) {
       return NextResponse.json(
-        { error: "Only reciver can decline friend request" },
+        { error: "Only the receiver can decline this request" },
         { status: 403 },
       );
     }
@@ -52,9 +52,9 @@ export async function POST(request: Request) {
       .set({
         status: "DECLINED",
       })
-      .where(eq(friendRequests.id, requestId));
+      .where(and(eq(friendRequests.id, requestId), eq(friendRequests.status, "PENDING")));
 
-    return NextResponse.json({ status: 201 });
+    return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
     return NextResponse.json(

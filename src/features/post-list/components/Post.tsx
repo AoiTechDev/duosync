@@ -62,7 +62,7 @@ const Post = ({ post, now }: { post: FeedPost; now: number }) => {
   const bumpWait = bumpAvailableAt(post.bumpedAt) - now;
   const wasBumped = new Date(post.bumpedAt).getTime() - new Date(post.createdAt).getTime() > 60_000;
   const [riotName, riotTag] = (author.summonerName ?? "").split("#");
-  const name = author.username || author.name || "Player";
+  const name = author.username || "Player";
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["posts"] });
 

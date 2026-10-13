@@ -4,6 +4,8 @@ import { authOptions } from "@/auth/options";
 import { db } from "@/lib/db";
 import { rankEnum, users, type Rank } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { rateLimit } from "@/lib/rate-limit";
 import {
   getAccountByRiotId,
   getLeagueEntriesByPuuid,
@@ -12,6 +14,16 @@ import {
   RiotError,
   type RiotLeagueEntry,
 } from "@/lib/riot";
+
+const BodySchema = z.object({
+  gameName: z.string().trim().min(3).max(16),
+  tagLine: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/^#/, ""))
+    .pipe(z.string().min(2).max(5).regex(/^[\p{L}\p{N}]+$/u)),
+  region: z.string(),
+});
 
 const APEX_TIERS = ["MASTER", "GRANDMASTER", "CHALLENGER"];
 
@@ -28,7 +40,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { gameName, tagLine, region } = await request.json();
+  const limit = await rateLimit("verifySummoner", session.user.email);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { success: false, message: `Too many attempts, try again in ${limit.retryAfter}s` },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
+    );
+  }
+
+  const parsed = BodySchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, message: "Enter a valid Riot ID" }, { status: 400 });
+  }
+  const { gameName, tagLine, region } = parsed.data;
 
   if (!isRiotRegion(region)) {
     return NextResponse.json({ success: false, message: "Invalid region" }, { status: 400 });

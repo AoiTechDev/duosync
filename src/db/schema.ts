@@ -81,32 +81,38 @@ export const friendshipStatusEnum = pgEnum("friendship_status", [
   "CANCELED",
 ]);
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name"),
-  email: text("email").unique().notNull(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
-  image: text("image"),
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name"),
+    email: text("email").unique().notNull(),
+    emailVerified: timestamp("emailVerified", { mode: "date" }),
+    image: text("image"),
 
-  username: text("username").unique().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    username: text("username").unique().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
 
-  summonerName: text("summoner_name"),
-  region: regionEnum("region"),
-  soloRank: rankEnum("solo_rank"),
-  flexRank: rankEnum("flex_rank"),
-  mainRole: roleEnum("main_role"),
-  secondaryRole: roleEnum("secondary_role"),
-  bio: text("bio"),
-  avatar: text("avatar"),
+    summonerName: text("summoner_name"),
+    region: regionEnum("region"),
+    soloRank: rankEnum("solo_rank"),
+    flexRank: rankEnum("flex_rank"),
+    mainRole: roleEnum("main_role"),
+    secondaryRole: roleEnum("secondary_role"),
+    bio: text("bio"),
+    avatar: text("avatar"),
 
-  playstyle: json("playstyle").$type<string[]>(),
-  communication: json("communication").$type<string[]>(),
-  goals: json("goals").$type<string[]>(),
-  availability: json("availability"),
-  lastSeenAt: timestamp("last_seen_at"),
-});
+    playstyle: json("playstyle").$type<string[]>(),
+    communication: json("communication").$type<string[]>(),
+    goals: json("goals").$type<string[]>(),
+    availability: json("availability"),
+    lastSeenAt: timestamp("last_seen_at"),
+  },
+  (table) => ({
+    usernameFormat: check("users_username_format", sql`${table.username} ~ '^[a-z0-9_]{3,24}$'`),
+  }),
+);
 
 export type User = typeof users.$inferSelect;
 

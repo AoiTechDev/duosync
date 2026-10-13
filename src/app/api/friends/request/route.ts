@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { and, eq, or, inArray } from "drizzle-orm";
+import { and, count, eq, gt, or, inArray } from "drizzle-orm";
 import { getCurrentUser } from "@/auth";
 import { db } from "@/lib/db";
 import { friendRequests, friendships, users } from "@/db/schema";
+import { rateLimit } from "@/lib/rate-limit";
+
+const MAX_PENDING_OUTBOUND = 30;
+const MAX_REQUESTS_PER_DAY_TO_SAME_USER = 3;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const BodySchema = z.object({
   toUserId: z.string().uuid(),
@@ -14,6 +19,14 @@ export async function POST(request: Request) {
     const me = await getCurrentUser();
     if (!me) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const limit = await rateLimit("friendRequest", me.id);
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: `Slow down, try again in ${limit.retryAfter}s` },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
+      );
     }
 
     const json = await request.json().catch(() => null);
@@ -30,6 +43,7 @@ export async function POST(request: Request) {
 
     const target = await db.query.users.findFirst({
       where: eq(users.id, toUserId),
+      columns: { id: true },
     });
     if (!target) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -57,6 +71,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Pending request ${dir}` }, { status: 409 });
     }
 
+    const dayAgo = new Date(Date.now() - DAY_MS);
+    const [[outbound], [recentToTarget], declinedRecently] = await Promise.all([
+      db
+        .select({ n: count() })
+        .from(friendRequests)
+        .where(and(eq(friendRequests.senderId, me.id), eq(friendRequests.status, "PENDING"))),
+      db
+        .select({ n: count() })
+        .from(friendRequests)
+        .where(
+          and(
+            eq(friendRequests.senderId, me.id),
+            eq(friendRequests.receiverId, toUserId),
+            gt(friendRequests.createdAt, dayAgo),
+          ),
+        ),
+      db.query.friendRequests.findFirst({
+        where: and(
+          eq(friendRequests.senderId, me.id),
+          eq(friendRequests.receiverId, toUserId),
+          eq(friendRequests.status, "DECLINED"),
+          gt(friendRequests.createdAt, dayAgo),
+        ),
+        columns: { id: true },
+      }),
+    ]);
+    if (outbound.n >= MAX_PENDING_OUTBOUND) {
+      return NextResponse.json(
+        { error: "Too many pending requests. Wait for some to be answered." },
+        { status: 429 },
+      );
+    }
+    if (declinedRecently || recentToTarget.n >= MAX_REQUESTS_PER_DAY_TO_SAME_USER) {
+      return NextResponse.json({ error: "You can't send this player another request yet" }, { status: 429 });
+    }
+
     const [created] = await db
       .insert(friendRequests)
       .values({ senderId: me.id, receiverId: toUserId, status: "PENDING" })
@@ -74,7 +124,8 @@ export async function GET(request: NextRequest) {
 
   const direction = sp.get("direction") ?? "inbound";
   const countOnly = sp.get("countOnly") === "true";
-  const limit = Math.min(Number(sp.get("limit") ?? "20"), 50);
+  const requested = Number.parseInt(sp.get("limit") ?? "20", 10);
+  const limit = Number.isFinite(requested) ? Math.min(Math.max(requested, 1), 50) : 20;
 
   try {
     const me = await getCurrentUser();

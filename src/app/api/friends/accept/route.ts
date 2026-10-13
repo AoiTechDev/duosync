@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     if (fr.receiverId !== me.id) {
       return NextResponse.json(
-        { error: "Only reciver can accept friend request" },
+        { error: "Only the receiver can accept this request" },
         { status: 403 },
       );
     }
@@ -49,15 +49,21 @@ export async function POST(request: Request) {
 
     const [a, b] = fr.senderId < me.id ? [fr.senderId, me.id] : [me.id, fr.senderId];
 
-    await db.transaction(async (tx) => {
-      await tx
+    const accepted = await db.transaction(async (tx) => {
+      const [updated] = await tx
         .update(friendRequests)
         .set({ status: "ACCEPTED" })
-        .where(and(eq(friendRequests.id, requestId), eq(friendRequests.status, "PENDING")));
+        .where(and(eq(friendRequests.id, requestId), eq(friendRequests.status, "PENDING")))
+        .returning({ id: friendRequests.id });
+      if (!updated) return false;
 
       await tx.insert(friendships).values({ userAId: a, userBId: b }).onConflictDoNothing();
+      return true;
     });
-    return NextResponse.json({ status: 201 });
+    if (!accepted) {
+      return NextResponse.json({ error: "This friend request has already been handled" }, { status: 409 });
+    }
+    return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
     return NextResponse.json(

@@ -36,7 +36,6 @@ export type PostWithAuthor = {
   author: {
     id: string;
     username: string;
-    name: string | null;
     image: string | null;
     avatar: string | null;
     summonerName: string | null;

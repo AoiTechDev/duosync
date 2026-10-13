@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { and, desc, eq, gt, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
+const FEED_LIMIT = 500;
+
 export async function GET() {
   try {
     const me = await getCurrentUser();
@@ -46,7 +48,6 @@ export async function GET() {
           author: {
             id: users.id,
             username: users.username,
-            name: users.name,
             image: users.image,
             avatar: users.avatar,
             summonerName: users.summonerName,
@@ -65,7 +66,8 @@ export async function GET() {
             or(gt(posts.expiresAt, sql`now()`), eq(posts.authorId, me.id)),
           ),
         )
-        .orderBy(desc(posts.bumpedAt)),
+        .orderBy(desc(posts.bumpedAt))
+        .limit(FEED_LIMIT),
     ]);
 
     const friendIds = new Set(
@@ -90,7 +92,7 @@ export async function GET() {
       return { ...post, relation: "none" as const };
     });
 
-    return NextResponse.json({ posts: withRelation });
+    return NextResponse.json({ posts: withRelation }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

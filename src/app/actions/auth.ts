@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { regionSchema, usernameSchema } from "@/validators/profile-validator";
 
 export async function signInAction(provider: "google" | "discord") {
   redirect(`/api/auth/signin/${provider}`);
@@ -45,12 +46,8 @@ export async function requireAuth() {
 }
 
 const updateUserSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3, "At least 3 characters")
-    .max(24, "At most 24 characters"),
-  region: z.enum(["NA1", "EUW1", "EUN1", "KR", "BR1", "LA1", "LA2"], { message: "Pick a region" }),
+  username: usernameSchema,
+  region: regionSchema,
   bio: z.string().trim().max(200, "At most 200 characters"),
 });
 

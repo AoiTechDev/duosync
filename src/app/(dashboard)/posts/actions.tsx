@@ -4,9 +4,12 @@ import { getCurrentUser } from "@/auth/server";
 import { posts } from "@/db/schema";
 import { db } from "@/lib/db";
 import { createPostValidator } from "@/validators/create-post-validator";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, gt, sql } from "drizzle-orm";
+import { rateLimit } from "@/lib/rate-limit";
 import { bumpAvailableAt, formatDuration, POST_TTL_MS } from "@/lib/post-lifecycle";
 import { revalidatePath } from "next/cache";
+
+const MAX_LIVE_POSTS = 3;
 
 interface CreatePostState {
   errors?: Record<string, string[]>;
@@ -43,7 +46,22 @@ export async function createPost(
     throw new Error("You have to be logged in to create a post");
   }
 
+  const limit = await rateLimit("createPost", user.id);
+  if (!limit.ok) {
+    return { errors: { database: [`Slow down, try again in ${limit.retryAfter}s`] } };
+  }
+
   try {
+    const [{ live }] = await db
+      .select({ live: count() })
+      .from(posts)
+      .where(and(eq(posts.authorId, user.id), eq(posts.isActive, true), gt(posts.expiresAt, sql`now()`)));
+    if (live >= MAX_LIVE_POSTS) {
+      return {
+        errors: { database: [`You already have ${MAX_LIVE_POSTS} live posts. Bump or delete one first.`] },
+      };
+    }
+
     await db.insert(posts).values({
       description: validatedFields.data.description,
       authorId: user.id,

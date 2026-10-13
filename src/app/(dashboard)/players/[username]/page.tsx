@@ -25,7 +25,6 @@ export default async function PlayerPage({ params }: Props) {
     .select({
       id: users.id,
       username: users.username,
-      name: users.name,
       image: users.image,
       avatar: users.avatar,
       summonerName: users.summonerName,
@@ -47,7 +46,11 @@ export default async function PlayerPage({ params }: Props) {
   if (!player) notFound();
 
   const viewer = await getRelation(me.id, player.id);
-  const visible = viewer.relation === "friend" ? player : { ...player, summonerName: null };
+  const visible = {
+    ...player,
+    name: null,
+    summonerName: viewer.relation === "friend" ? player.summonerName : null,
+  };
 
   return <ProfileView user={visible} viewer={viewer} />;
 }

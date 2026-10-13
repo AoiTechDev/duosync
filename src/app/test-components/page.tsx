@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const variants = [
@@ -16,6 +17,8 @@ const states = [
 ] as const;
 
 export default function TestComponentsPage() {
+  if (process.env.NODE_ENV === "production") notFound();
+
   return (
     <main className="min-h-screen p-6 md:p-16">
       <section className="overflow-x-auto rounded-2xl border border-border bg-card p-8">

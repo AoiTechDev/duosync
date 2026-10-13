@@ -1,4 +1,5 @@
 "use client";
+import { sanitizeUsernameInput } from "@/lib/username";
 import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AlertCircle, ArrowLeft, Check, Loader2, X } from "lucide-react";
@@ -44,7 +45,8 @@ export function EditProfileForm({
     }
   };
 
-  const handleUsername = (value: string) => {
+  const handleUsername = (raw: string) => {
+    const value = sanitizeUsernameInput(raw);
     setUsername(value);
     latest.current = value;
     clearTimeout(timer.current);

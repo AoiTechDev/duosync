@@ -62,12 +62,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
         const cleanedData = {
           username: data.username,
           region: data.region,
-          summonerName: data.summonerName,
-          gameName: data.gameName,
-          tagLine: data.tagLine,
-          riotVerified: data.riotVerified,
-          soloRank: data.soloRank,
-          flexRank: data.flexRank,
           mainRole: data.mainRole,
           secondaryRole: data.secondaryRole,
           playstyleTags: data.playstyleTags,

@@ -4,6 +4,26 @@ import DiscordProvider from "next-auth/providers/discord";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { USERNAME_PATTERN, sanitizeUsernameInput } from "@/lib/username";
+
+async function generateUsername(seed: string) {
+  let base = sanitizeUsernameInput(seed).slice(0, 18);
+  if (base.length < 3) base = `player${base}`;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const candidate = attempt === 0 ? base : `${base}_${Math.floor(1000 + Math.random() * 9000)}`;
+    if (!USERNAME_PATTERN.test(candidate)) continue;
+    const [taken] = await db.select({ id: users.id }).from(users).where(eq(users.username, candidate)).limit(1);
+    if (!taken) return candidate;
+  }
+  return `player_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+}
+
+function hasVerifiedEmail(provider: string | undefined, profile: unknown) {
+  const p = (profile ?? {}) as { email_verified?: boolean | string; verified?: boolean };
+  if (provider === "google") return p.email_verified === true || p.email_verified === "true";
+  if (provider === "discord") return p.verified === true;
+  return false;
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -23,8 +43,8 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async signIn({ user }) {
-      if (!user.email) {
+    async signIn({ user, account, profile }) {
+      if (!user.email || !hasVerifiedEmail(account?.provider, profile)) {
         return false;
       }
 
@@ -38,18 +58,15 @@ export const authOptions: NextAuthOptions = {
         if (existingUser.length === 0) {
           await db.insert(users).values({
             email: user.email,
-            username: user.name || user.email.split("@")[0],
+            username: await generateUsername(user.name || user.email.split("@")[0]),
             name: user.name,
             image: user.image,
           });
-          console.log("✅ New user created:", user.email);
-        } else {
-          console.log("👋 Existing user signed in:", user.email);
         }
 
         return true;
       } catch (error) {
-        console.error("❌ Error during sign in:", error);
+        console.error("Error during sign in:", error);
         return false;
       }
     },
@@ -69,17 +86,14 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
+    async jwt({ token }) {
       return token;
     },
 
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (url.startsWith(baseUrl)) return url;
-      return `${baseUrl}/dashboard`;
+      return `${baseUrl}/posts`;
     },
   },
   debug: process.env.NODE_ENV === "development",
