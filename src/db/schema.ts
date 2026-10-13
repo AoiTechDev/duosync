@@ -165,7 +165,7 @@ export const posts = pgTable("posts", {
   description: text("description"),
   isActive: boolean("is_active").default(true).notNull(),
   expiresAt: timestamp("expires_at")
-    .default(sql`now() + interval '2 hours'`)
+    .default(sql`now() + interval '24 hours'`)
     .notNull(),
   bumpedAt: timestamp("bumped_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

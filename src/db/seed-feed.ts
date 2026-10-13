@@ -1,5 +1,6 @@
 import { and, eq, inArray, like, or } from "drizzle-orm";
 import { db } from "@/lib/db";
+import { POST_TTL_MS } from "@/lib/post-lifecycle";
 import {
   friendRequests,
   friendships,
@@ -97,7 +98,7 @@ async function seed() {
   await db.insert(posts).values(
     Array.from({ length: POSTS }, () => {
       const author = pick(players);
-      const bumpedMinutesAgo = Math.random() * 115;
+      const bumpedMinutesAgo = Math.random() * (POST_TTL_MS / 60_000 - 60);
       const bumpedAt = minutesAgo(bumpedMinutesAgo);
       return {
         authorId: author.id,
@@ -108,12 +109,12 @@ async function seed() {
         gameMode: pick(gameModeEnum.enumValues),
         createdAt: minutesAgo(bumpedMinutesAgo + Math.random() * 60),
         bumpedAt,
-        expiresAt: new Date(bumpedAt.getTime() + 2 * 60 * 60 * 1000),
+        expiresAt: new Date(bumpedAt.getTime() + POST_TTL_MS),
       };
     }),
   );
 
-  console.log(`Seeded ${players.length} players and ${POSTS} posts (live for up to 2h)`);
+  console.log(`Seeded ${players.length} players and ${POSTS} posts (live for up to ${POST_TTL_MS / 3_600_000}h)`);
 }
 
 async function seedFriends(username: string) {

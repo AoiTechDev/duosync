@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ALTER COLUMN "expires_at" SET DEFAULT now() + interval '24 hours';

@@ -69,6 +69,7 @@ export async function createPost(
       region: validatedFields.data.region,
       role: validatedFields.data.role,
       gameMode: validatedFields.data.gameMode,
+      expiresAt: new Date(Date.now() + POST_TTL_MS),
     });
 
     revalidatePath("/feed");

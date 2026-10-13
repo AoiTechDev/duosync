@@ -1,5 +1,5 @@
-export const POST_TTL_MS = 2 * 60 * 60 * 1000;
-export const BUMP_COOLDOWN_MS = 30 * 60 * 1000;
+export const POST_TTL_MS = 24 * 60 * 60 * 1000;
+export const BUMP_COOLDOWN_MS = 60 * 60 * 1000;
 export const ONLINE_WINDOW_MS = 5 * 60 * 1000;
 export const HEARTBEAT_MS = 60 * 1000;
 
