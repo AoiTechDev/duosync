@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { RankBadge } from "@/components/RankBadge";
 import { LayoutList, Pencil, UserRound, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,7 +23,6 @@ const ITEMS = [
 ];
 
 export function UserAvatar({ user, size = 36 }: { user: AuthUser; size?: number }) {
-  const rank = parseRank(user.soloRank);
   return (
     <span className="relative inline-flex">
       <Avatar className="ring-2 ring-primary/40" style={{ width: size, height: size }}>
@@ -31,11 +31,7 @@ export function UserAvatar({ user, size = 36 }: { user: AuthUser; size?: number 
           {getUserInitials(user.name, user.username)}
         </AvatarFallback>
       </Avatar>
-      {rank?.icon && (
-        <span className="absolute -right-1 -bottom-1 flex size-[18px] items-center justify-center rounded-full border border-border bg-card">
-          <Image src={rank.icon} alt="" width={12} height={12} />
-        </span>
-      )}
+      <RankBadge rank={user.soloRank} size="sm" className="-right-1.5 -bottom-1" />
     </span>
   );
 }

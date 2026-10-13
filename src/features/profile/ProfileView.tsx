@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { RankBadge } from "@/components/RankBadge";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { Check, Lock, Pencil } from "lucide-react";
@@ -12,6 +13,7 @@ import { RiotLinkCard } from "./RiotLinkCard";
 import { ProfileAction } from "./ProfileAction";
 import { OnlineDot } from "@/components/presence/OnlineDot";
 import { isOnline } from "@/lib/post-lifecycle";
+import { RegionCode } from "@/components/RegionCode";
 
 const nameOf = (list: { id: string; name: string }[], id: string) => list.find((x) => x.id === id)?.name ?? id;
 const role = (id?: string | null) => ROLES.find((r) => r.id === id);
@@ -126,11 +128,7 @@ export function ProfileView({
                 )}
               </div>
               {!isOwner && <OnlineDot lastSeenAt={user.lastSeenAt} className="top-1 left-1 size-5" />}
-              {solo?.icon && (
-                <div className="absolute -right-1 -bottom-1 flex size-8 items-center justify-center rounded-full border border-border bg-card">
-                  <Image src={solo.icon} alt="" width={22} height={22} />
-                </div>
-              )}
+              <RankBadge rank={user.soloRank} size="lg" className="-right-1 -bottom-1" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -158,7 +156,7 @@ export function ProfileView({
                 {riotName && region && <span className="text-muted-foreground">·</span>}
                 {region && (
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-2.5 py-1 text-xs font-semibold">
-                    <span className="font-mono text-[10px] font-bold text-electric">{region.code}</span>
+                    <RegionCode code={region.code} />
                     {region.label}
                   </span>
                 )}

@@ -17,6 +17,7 @@ import CreatePost from "@/features/create-post/CreatePost";
 import PostSkeleton from "@/components/PostSkeleton";
 import { VirtualPostList } from "./components/VirtualPostList";
 import { EditPostDialog } from "./components/EditPostDialog";
+import { RegionCode } from "@/components/RegionCode";
 
 const LANES = ROLES.filter((r) => r.id !== "FILL");
 const RANK_FILTERS = ["GOLD", "PLATINUM", "EMERALD", "DIAMOND", "MASTER"] as const;
@@ -196,7 +197,7 @@ const Posts = ({ user }: { user: User }) => {
                 <SelectItem value="ALL">All regions</SelectItem>
                 {REGION_OPTIONS.map((r) => (
                   <SelectItem key={r.value} value={r.value}>
-                    <span className="font-mono text-[10px] font-bold text-electric">{r.code}</span>
+                    <RegionCode code={r.code} />
                     {r.label}
                   </SelectItem>
                 ))}

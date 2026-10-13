@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
+import { RankBadge } from "@/components/RankBadge";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowUp, Check, Clock, Hourglass, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
@@ -130,11 +131,7 @@ const Post = ({ post, now }: { post: FeedPost; now: number }) => {
                 </div>
               )}
               <OnlineDot lastSeenAt={author.lastSeenAt} now={now} className="-top-0.5 -left-0.5 size-3.5" />
-              {rank?.icon && (
-                <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border border-border bg-card">
-                  <Image src={rank.icon} alt="" width={14} height={14} />
-                </div>
-              )}
+              <RankBadge rank={author.soloRank} />
             </Link>
 
             <div className="min-w-0">

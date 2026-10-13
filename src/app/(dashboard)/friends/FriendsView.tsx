@@ -1,6 +1,7 @@
 "use client";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
+import { RankBadge } from "@/components/RankBadge";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Loader2, Lock, UserMinus, Users } from "lucide-react";
@@ -14,6 +15,7 @@ import { parseRank } from "@/lib/rank";
 import { OnlineDot } from "@/components/presence/OnlineDot";
 import { useNow } from "@/hooks/use-now";
 import { isOnline } from "@/lib/post-lifecycle";
+import { RegionCode } from "@/components/RegionCode";
 
 type Friend = {
   id: string;
@@ -59,7 +61,6 @@ function Avatar({
   lastSeenAt?: string | null;
   now?: number;
 }) {
-  const parsed = parseRank(rank);
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       {src ? (
@@ -72,11 +73,7 @@ function Avatar({
       {lastSeenAt !== undefined && (
         <OnlineDot lastSeenAt={lastSeenAt} now={now} className="-top-0.5 -left-0.5 size-3.5" />
       )}
-      {parsed?.icon && (
-        <span className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border border-border bg-card">
-          <Image src={parsed.icon} alt="" width={14} height={14} />
-        </span>
-      )}
+      <RankBadge rank={rank} size={size < 44 ? "sm" : "md"} />
     </div>
   );
 }
@@ -184,7 +181,7 @@ function FriendCard({ friend, now }: { friend: Friend; now: number }) {
         )}
         {region && (
           <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-popover/60 px-2">
-            <span className="font-mono text-[10px] font-bold text-electric">{region.code}</span>
+            <RegionCode code={region.code} />
             {region.label}
           </span>
         )}
