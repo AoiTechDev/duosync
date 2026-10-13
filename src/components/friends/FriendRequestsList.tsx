@@ -108,7 +108,7 @@ export function FriendRequestsList({ compact }: { compact?: boolean }) {
           return (
             <li key={r.id} className={`flex items-center gap-3 ${compact ? "px-3 py-2.5" : "px-4 py-3"}`}>
               {!compact && <Avatar user={r.otherUser} />}
-              {compact && rank?.icon && <Image src={rank.icon} alt="" width={22} height={22} />}
+              {compact && rank?.badge && <Image src={rank.badge} alt="" width={20} height={20} />}
               <div className="min-w-0 flex-1">
                 {r.otherUser.username ? (
                   <Link
@@ -121,7 +121,7 @@ export function FriendRequestsList({ compact }: { compact?: boolean }) {
                   <div className="truncate text-sm font-semibold">Unknown</div>
                 )}
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  {!compact && rank?.icon && <Image src={rank.icon} alt="" width={14} height={14} />}
+                  {!compact && rank?.badge && <Image src={rank.badge} alt="" width={14} height={14} />}
                   {rank?.label ?? "Unranked"}
                 </div>
               </div>

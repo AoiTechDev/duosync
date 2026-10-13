@@ -21,6 +21,7 @@ export interface ParsedRank {
   tier: string;
   label: string;
   icon?: string;
+  badge?: string;
   color: string;
   index: number;
 }
@@ -30,10 +31,12 @@ export function parseRank(rank?: string | null): ParsedRank | null {
   const [tier, division] = rank.split("_");
   const index = TIER_ORDER.indexOf(tier as (typeof TIER_ORDER)[number]);
   if (index === -1) return null;
+  const icon = RANKS.find((r) => r.id === tier)?.icon;
   return {
     tier,
     label: division && ROMAN.has(division) ? `${titleCase(tier)} ${division}` : titleCase(tier),
-    icon: RANKS.find((r) => r.id === tier)?.icon,
+    icon,
+    badge: icon?.replace("/ranks/", "/ranks/badge/"),
     color: `var(--${tier.toLowerCase()})`,
     index,
   };

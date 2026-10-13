@@ -43,7 +43,7 @@ export function VirtualPostList({ posts, now }: { posts: FeedPost[]; now: number
             key={item.key}
             data-index={item.index}
             ref={virtualizer.measureElement}
-            className="absolute top-0 left-0 grid w-full items-start gap-5 md:grid-cols-2"
+            className="absolute top-0 left-0 grid w-full items-stretch gap-5 md:grid-cols-2"
             style={{ transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)` }}
           >
             {rows[item.index].map((post) => (

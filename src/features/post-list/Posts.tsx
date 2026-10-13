@@ -174,7 +174,7 @@ const Posts = ({ user }: { user: User }) => {
                     active={minTier === tier}
                     onClick={() => setMinTier(minTier === tier ? null : tier)}
                   >
-                    {parsed?.icon && <Image src={parsed.icon} alt="" width={16} height={16} />}
+                    {parsed?.badge && <Image src={parsed.badge} alt="" width={18} height={18} />}
                     {tierLabel(tier)}+
                   </FilterChip>
                 );

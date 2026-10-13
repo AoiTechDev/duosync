@@ -66,8 +66,8 @@ export function ServerUserDropdown({ user }: { user: AuthUser }) {
         className="w-64 rounded-2xl border-border bg-popover/95 p-1.5 shadow-[0_24px_60px_-20px_rgb(0_0_0/0.8)] backdrop-blur-xl"
       >
         <DropdownMenuLabel className="flex items-center gap-3 px-2.5 py-2.5">
-          {rank?.icon ? (
-            <Image src={rank.icon} alt="" width={30} height={30} />
+          {rank?.badge ? (
+            <Image src={rank.badge} alt="" width={28} height={28} />
           ) : (
             <span className="size-[30px] rounded-full border border-dashed border-border" />
           )}

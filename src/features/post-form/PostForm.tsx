@@ -195,12 +195,12 @@ export function PostForm({
                       : "border-border bg-background/40 hover:border-input"
                   }`}
                 >
-                  {rank.icon && (
+                  {rank.badge && (
                     <Image
-                      src={rank.icon}
+                      src={rank.badge}
                       alt=""
-                      width={30}
-                      height={30}
+                      width={28}
+                      height={28}
                       className={`transition-[filter,opacity,transform] duration-200 ${
                         selected ? "scale-110" : "opacity-45 grayscale-[0.6] group-hover:opacity-90 group-hover:grayscale-0"
                       }`}

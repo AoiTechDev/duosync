@@ -18,9 +18,8 @@ export function RankBadge({
   className?: string;
 }) {
   const parsed = parseRank(rank);
-  if (!parsed?.icon) return null;
+  if (!parsed?.badge) return null;
   const { box, icon } = SIZES[size];
-  const src = parsed.icon.replace("/ranks/", "/ranks/badge/");
 
   return (
     <span
@@ -28,7 +27,7 @@ export function RankBadge({
       style={{ "--tier": parsed.color } as CSSProperties}
       className={`absolute flex ${box} items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--tier)_65%,transparent)] bg-background shadow-[0_0_10px_color-mix(in_oklab,var(--tier)_45%,transparent)] ${className}`}
     >
-      <Image src={src} alt={parsed.label} width={icon} height={icon} className="object-contain" />
+      <Image src={parsed.badge} alt={parsed.label} width={icon} height={icon} className="object-contain" />
     </span>
   );
 }

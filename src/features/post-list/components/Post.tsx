@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { acceptFriendRequest, sendFriendRequest } from "@/features/friends/api";
 import { bumpPost, deletePost } from "@/app/(dashboard)/feed/actions";
 import { OnlineDot } from "@/components/presence/OnlineDot";
+import { ClampedText } from "./ClampedText";
 import { bumpAvailableAt, formatDuration, isExpired } from "@/lib/post-lifecycle";
 
 const AVATAR_GRADIENTS = [
@@ -42,7 +43,9 @@ function LookingForChip({ label, value, icon }: { label: string; value: string; 
       <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-card">{icon}</div>
       <div className="min-w-0">
         <div className="text-[11px] text-muted-foreground">{label}</div>
-        <div className="truncate text-sm font-semibold">{value}</div>
+        <div className="line-clamp-2 text-sm leading-snug font-semibold" title={value}>
+          {value}
+        </div>
       </div>
     </div>
   );
@@ -102,12 +105,14 @@ const Post = ({ post, now }: { post: FeedPost; now: number }) => {
   return (
     <article
       style={tierStyle}
-      className={`group relative overflow-hidden rounded-2xl border border-border bg-card/90 ${expired ? "opacity-60 saturate-50 hover:opacity-100 hover:saturate-100" : ""} shadow-[0_22px_50px_-28px_color-mix(in_oklab,var(--tier)_70%,transparent)] transition-[border-color,opacity,filter] duration-200 hover:border-[color-mix(in_oklab,var(--tier)_40%,var(--border))]`}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card/90 ${expired ? "opacity-60 hover:opacity-100" : ""} shadow-[0_22px_50px_-28px_color-mix(in_oklab,var(--tier)_70%,transparent)] transition-[border-color,opacity] duration-200 hover:border-[color-mix(in_oklab,var(--tier)_40%,var(--border))]`}
     >
       <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-(--tier) to-transparent opacity-80" />
-      <div className="pointer-events-none absolute -top-28 -right-20 size-72 rounded-full bg-(--tier) opacity-[0.16] blur-3xl" />
+      {!expired && (
+        <div className="pointer-events-none absolute -top-28 -right-20 size-72 rounded-full bg-(--tier) opacity-[0.16] blur-3xl" />
+      )}
 
-      <div className="relative p-5">
+      <div className="relative flex flex-1 flex-col p-5">
         <header className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
             <Link
@@ -185,11 +190,9 @@ const Post = ({ post, now }: { post: FeedPost; now: number }) => {
           </div>
         </header>
 
-        {post.description && (
-          <p className="mt-4 text-[15px] leading-relaxed text-foreground/90">{post.description}</p>
-        )}
+        {post.description && <ClampedText key={post.description} text={post.description} className="mt-4" />}
 
-        <div className="mt-5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="mt-auto pt-5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
           Looking for
         </div>
         <div className="mt-2.5 grid grid-cols-1 gap-2 min-[440px]:grid-cols-3">
@@ -203,7 +206,7 @@ const Post = ({ post, now }: { post: FeedPost; now: number }) => {
           <LookingForChip
             label="Min rank"
             value={minRank ? `${tierLabel(minRank.tier)}+` : "Any"}
-            icon={minRank?.icon ? <Image src={minRank.icon} alt="" width={22} height={22} /> : null}
+            icon={minRank?.badge ? <Image src={minRank.badge} alt="" width={22} height={22} /> : null}
           />
           <LookingForChip
             label="Region"
