@@ -11,7 +11,7 @@ type Props = { params: Promise<{ username: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
-  return { title: `${decodeURIComponent(username)} · DuoGG` };
+  return { title: decodeURIComponent(username), robots: { index: false } };
 }
 
 export default async function PlayerPage({ params }: Props) {

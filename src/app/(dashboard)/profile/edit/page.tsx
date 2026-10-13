@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/auth";
 import { EditProfileForm } from "./EditProfileForm";
 
-export const metadata: Metadata = { title: "Edit profile · DuoGG" };
+export const metadata: Metadata = { title: "Edit profile" };
 
 export default async function EditProfilePage() {
   const user = await getCurrentUser();

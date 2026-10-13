@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/auth";
 import { redirect } from "next/navigation";
 import { ProfileView } from "@/features/profile/ProfileView";
 
-export const metadata: Metadata = { title: "Profile · DuoGG" };
+export const metadata: Metadata = { title: "Profile" };
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();

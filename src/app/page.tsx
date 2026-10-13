@@ -1,9 +1,9 @@
-import { AuthButtons } from "@/components/auth/AuthButtons";
+import type { Metadata } from "next";
+import { Landing } from "@/components/landing/Landing";
 
-export default function Home() {
-  return (
-    <div className="">
-      <AuthButtons />
-    </div>
-  );
-}
+export const metadata: Metadata = {
+  title: { absolute: "DuoGG · Find your League of Legends duo" },
+  alternates: { canonical: "/" },
+};
+
+export default Landing;

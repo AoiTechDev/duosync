@@ -11,6 +11,7 @@ export default withAuth(
       pathname.startsWith("/api/") ||
       pathname.startsWith("/_next/") ||
       pathname.startsWith("/favicon.ico") ||
+      pathname.startsWith("/opengraph-image") ||
       pathname === "/login"
     ) {
       return NextResponse.next();
@@ -18,12 +19,12 @@ export default withAuth(
 
     const token = await getToken({ req });
 
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", req.url));
+    if (pathname === "/") {
+      return token ? NextResponse.redirect(new URL("/feed", req.url)) : NextResponse.next();
     }
 
-    if (pathname === "/") {
-      return NextResponse.redirect(new URL("/feed", req.url));
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
 
     return NextResponse.next();
@@ -36,6 +37,8 @@ export default withAuth(
         if (pathname === "/login") return true;
 
         if (pathname === "/") return true;
+
+        if (pathname.startsWith("/opengraph-image")) return true;
 
         return !!token;
       },
