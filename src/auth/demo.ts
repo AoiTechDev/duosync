@@ -5,7 +5,7 @@ import { users } from "@/db/schema";
 export const DEMO_EMAIL = "demo@duogg.test";
 
 export function isDemoLoginEnabled() {
-  return process.env.DEMO_LOGIN === "true" && process.env.VERCEL_ENV !== "production";
+  return process.env.DEMO_LOGIN?.trim().toLowerCase() === "true" && process.env.VERCEL_ENV !== "production";
 }
 
 export async function getOrCreateDemoUser() {
