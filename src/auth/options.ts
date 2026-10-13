@@ -93,7 +93,7 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (url.startsWith(baseUrl)) return url;
-      return `${baseUrl}/posts`;
+      return `${baseUrl}/feed`;
     },
   },
   debug: process.env.NODE_ENV === "development",

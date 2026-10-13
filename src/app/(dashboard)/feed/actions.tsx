@@ -71,7 +71,7 @@ export async function createPost(
       gameMode: validatedFields.data.gameMode,
     });
 
-    revalidatePath("/posts");
+    revalidatePath("/feed");
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -136,7 +136,7 @@ export async function editPost(
       })
       .where(and(eq(posts.id, postId), eq(posts.authorId, user.id), eq(posts.isActive, true)));
 
-    revalidatePath("/posts");
+    revalidatePath("/feed");
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -163,7 +163,7 @@ export async function deletePost(postId: string): Promise<{ success: boolean; er
 
     if (!deleted) return { success: false, error: "Post not found" };
 
-    revalidatePath("/posts");
+    revalidatePath("/feed");
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -195,7 +195,7 @@ export async function bumpPost(postId: string): Promise<{ success: boolean; erro
       .set({ bumpedAt: now, expiresAt: new Date(now.getTime() + POST_TTL_MS), updatedAt: now })
       .where(eq(posts.id, postId));
 
-    revalidatePath("/posts");
+    revalidatePath("/feed");
     return { success: true };
   } catch (error) {
     console.error(error);

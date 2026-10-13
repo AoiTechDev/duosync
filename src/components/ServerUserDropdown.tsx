@@ -18,7 +18,7 @@ const ITEMS = [
   { href: "/profile", label: "Profile", icon: UserRound },
   { href: "/profile/edit", label: "Edit profile", icon: Pencil },
   { href: "/friends", label: "Friends", icon: Users },
-  { href: "/posts", label: "Posts", icon: LayoutList },
+  { href: "/feed", label: "Feed", icon: LayoutList },
 ];
 
 export function UserAvatar({ user, size = 36 }: { user: AuthUser; size?: number }) {

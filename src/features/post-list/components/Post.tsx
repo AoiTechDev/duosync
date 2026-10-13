@@ -14,7 +14,7 @@ import { formatRelativeTime } from "@/lib/utils";
 import { useFormStore } from "@/store/create-post-store";
 import { Button } from "@/components/ui/button";
 import { acceptFriendRequest, sendFriendRequest } from "@/features/friends/api";
-import { bumpPost, deletePost } from "@/app/(dashboard)/posts/actions";
+import { bumpPost, deletePost } from "@/app/(dashboard)/feed/actions";
 import { OnlineDot } from "@/components/presence/OnlineDot";
 import { bumpAvailableAt, formatDuration, isExpired } from "@/lib/post-lifecycle";
 

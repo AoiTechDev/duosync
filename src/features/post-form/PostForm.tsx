@@ -10,7 +10,7 @@ import { ROLES } from "@/data/preferences";
 import { REGION_OPTIONS } from "@/data/regions";
 import { GAME_MODES } from "@/data/game-modes";
 import { parseRank, TIER_ORDER, tierLabel } from "@/lib/rank";
-import { createPost, editPost } from "@/app/(dashboard)/posts/actions";
+import { createPost, editPost } from "@/app/(dashboard)/feed/actions";
 
 const DESCRIPTION_MAX = 280;
 const LANES = ROLES.filter((r) => r.id !== "FILL");

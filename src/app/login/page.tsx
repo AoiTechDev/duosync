@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/auth";
 import { AuthButtons } from "@/components/auth/AuthButtons";
 import EmblemField from "./EmblemField";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -14,7 +16,9 @@ const FEATURES = [
   { n: "03", title: "Voice-ready", text: "Filter by how players like to talk." },
 ];
 
-const LoginPage = () => {
+const LoginPage = async () => {
+  if (await getCurrentUser()) redirect("/feed");
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-background">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">

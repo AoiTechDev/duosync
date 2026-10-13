@@ -319,7 +319,7 @@ export function FriendsView() {
                 Send a request from a post in the feed. Once they accept, you&apos;ll see each other&apos;s Riot ID here.
               </p>
               <Button asChild size="sm" className="mt-5">
-                <Link href="/posts">Browse the feed</Link>
+                <Link href="/feed">Browse the feed</Link>
               </Button>
             </div>
           ) : (

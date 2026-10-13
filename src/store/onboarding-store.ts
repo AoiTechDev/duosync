@@ -78,7 +78,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
           if (response.ok) {
             set({ isCompleted: true });
-            window.location.href = "/posts";
+            window.location.href = "/feed";
           }
         } catch (error) {
           console.error("Failed to complete onboarding:", error);

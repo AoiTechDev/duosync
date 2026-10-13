@@ -9,7 +9,7 @@ import { FriendRequestsList, useInboundRequests } from "./friends/FriendRequests
 import { RequestCount } from "./FriendsDropdown";
 
 const LINKS = [
-  { href: "/posts", label: "Feed" },
+  { href: "/feed", label: "Feed" },
   { href: "/friends", label: "Friends" },
   { href: "/profile", label: "Profile" },
   { href: "/profile/edit", label: "Edit profile" },

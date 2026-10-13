@@ -22,7 +22,7 @@ export function AuthButtons() {
         <Button
           variant="discord"
           className="w-full"
-          onClick={() => signIn("discord", { callbackUrl: "/posts" })}
+          onClick={() => signIn("discord", { callbackUrl: "/feed" })}
         >
           <SiDiscord className="size-5" />
           Continue with Discord
@@ -30,7 +30,7 @@ export function AuthButtons() {
         <Button
           variant="light"
           className="w-full"
-          onClick={() => signIn("google", { callbackUrl: "/posts" })}
+          onClick={() => signIn("google", { callbackUrl: "/feed" })}
         >
           <FcGoogle className="size-5" />
           Continue with Google

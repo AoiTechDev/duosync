@@ -23,7 +23,7 @@ export default withAuth(
     }
 
     if (pathname === "/") {
-      return NextResponse.redirect(new URL("/posts", req.url));
+      return NextResponse.redirect(new URL("/feed", req.url));
     }
 
     return NextResponse.next();

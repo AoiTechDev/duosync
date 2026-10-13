@@ -14,7 +14,7 @@ export default async function OnboardingPage() {
   }
 
   if (isProfileComplete(user)) {
-    redirect("/posts");
+    redirect("/feed");
   }
 
   return <OnboardingClient />;
