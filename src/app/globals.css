@@ -65,6 +65,65 @@
     }
   }
 
+  /* Rank reveal (onboarding step 2) */
+  --animate-ring-in: ring-in 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  @keyframes ring-in {
+    from {
+      opacity: 0;
+      transform: scale(0.55);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  --animate-emblem-pop: emblem-pop 750ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  @keyframes emblem-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.3) rotate(-10deg);
+      filter: brightness(2.2);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.08) rotate(2deg);
+      filter: brightness(1.4);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+      filter: brightness(1);
+    }
+  }
+  --animate-ring-pulse: ring-pulse 2.6s ease-out infinite;
+  @keyframes ring-pulse {
+    0% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.35);
+    }
+  }
+  --animate-ring-sweep: ring-sweep 5s linear infinite;
+  @keyframes ring-sweep {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  --animate-burst: burst 900ms ease-out both;
+  @keyframes burst {
+    0% {
+      opacity: 0.9;
+      transform: scale(0.4);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
   --animate-float: float 7s ease-in-out infinite;
   @keyframes float {
     0%,

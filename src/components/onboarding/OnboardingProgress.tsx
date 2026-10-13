@@ -1,60 +1,63 @@
 "use client";
+import { Fragment } from "react";
+import { Check } from "lucide-react";
 import { useOnboardingStore } from "@/store/onboarding-store";
 
-const steps = [
-  { number: 1, title: "Basic Info" },
-  { number: 2, title: "Riot Account" },
-  { number: 3, title: "Preferences" },
-];
+const STEPS = ["Basic info", "Riot account", "Preferences"];
+const HEX = "[clip-path:polygon(25%_4%,75%_4%,100%_50%,75%_96%,25%_96%,0_50%)]";
 
 export function OnboardingProgress() {
   const currentStep = useOnboardingStore((state) => state.currentStep);
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <div className="text-center mb-16">
-        <h1 className="text-3xl font-bold text-foreground mb-3">Welcome to DuoSync</h1>
-        <p className="text-muted-foreground">Let&apos;s set up your profile</p>
-      </div>
+    <ol className="mx-auto flex w-full max-w-[560px] items-start justify-center">
+      {STEPS.map((title, i) => {
+        const n = i + 1;
+        const done = currentStep > n;
+        const active = currentStep === n;
+        const lit = done || active;
 
-      <div className="flex items-center justify-between relative">
-        <div className="absolute top-6 left-6 right-6 h-0.5 bg-border -z-10" />
-
-        <div
-          className="absolute top-6 left-6 h-0.5 bg-primary transition-all duration-700 ease-out -z-10"
-          style={{
-            width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
-            maxWidth: "calc(100% - 48px)",
-          }}
-        />
-
-        {steps.map((step) => (
-          <div key={step.number} className="flex flex-col items-center relative">
-            <div
-              className={`
-              w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 bg-background border-2
-              ${
-                currentStep >= step.number
-                  ? "border-primary text-primary"
-                  : "border-border text-muted-foreground"
-              }
-            `}
-            >
-              {step.number}
-            </div>
-
-            <div className="mt-4 text-center">
+        return (
+          <Fragment key={title}>
+            <li className="flex w-[104px] shrink-0 flex-col items-center gap-2.5">
               <div
-                className={`text-sm font-medium ${
-                  currentStep >= step.number ? "text-foreground" : "text-muted-foreground"
+                className={
+                  lit ? "drop-shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_55%,transparent)]" : ""
+                }
+              >
+                <div className={`relative size-10 ${HEX} ${lit ? "bg-primary" : "bg-input"}`}>
+                  <div
+                    className={`absolute inset-[1.5px] flex items-center justify-center text-sm font-bold ${HEX} ${
+                      lit ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
+                    }`}
+                  >
+                    {done ? <Check className="size-4" strokeWidth={3} /> : n}
+                  </div>
+                </div>
+              </div>
+              <span
+                className={`text-xs sm:text-sm ${
+                  active ? "font-semibold text-primary" : done ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
-                {step.title}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                {title}
+              </span>
+            </li>
+            {n < STEPS.length && (
+              <li
+                aria-hidden
+                className={`mt-5 h-0.5 flex-1 rounded-full transition-colors duration-500 ${
+                  done
+                    ? "bg-primary"
+                    : active
+                      ? "bg-linear-to-r from-primary to-input"
+                      : "bg-input"
+                }`}
+              />
+            )}
+          </Fragment>
+        );
+      })}
+    </ol>
   );
 }

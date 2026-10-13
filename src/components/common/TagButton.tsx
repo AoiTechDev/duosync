@@ -15,23 +15,20 @@ export function TagButton({
 }) {
   return (
     <button
+      type="button"
+      aria-pressed={selected}
       onClick={(e) => {
         e.preventDefault();
         onClick();
       }}
       disabled={disabled}
-      className={`
-          inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all cursor-pointer
-          ${
-            selected
-              ? "bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20"
-              : disabled
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"
-          }
-        `}
+      className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-35 ${
+        selected
+          ? "border-primary bg-primary/[0.07] text-primary shadow-[0_0_14px_color-mix(in_oklab,var(--primary)_25%,transparent)]"
+          : "border-border bg-card/70 text-foreground/90 enabled:hover:border-input enabled:hover:bg-popover"
+      }`}
     >
-      {icon && <Image src={icon} alt={label} width={20} height={20} />}
+      {icon && <Image src={icon} alt="" width={18} height={18} />}
       <span>{label}</span>
     </button>
   );

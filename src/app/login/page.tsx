@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthButtons } from "@/components/auth/AuthButtons";
 import EmblemField from "./EmblemField";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export const metadata: Metadata = {
   title: "Sign in · DuoSync",
@@ -28,16 +29,7 @@ const LoginPage = () => {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-[clamp(20px,5vw,80px)] pt-10 pb-14">
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex size-8 items-center justify-center rounded-full bg-linear-to-br from-primary to-accent shadow-[0_0_16px_color-mix(in_oklab,var(--accent)_55%,transparent)]">
-            <div className="flex size-[22px] items-center justify-center rounded-full bg-background font-display text-[11px] font-black text-primary">
-              D
-            </div>
-          </div>
-          <div className="font-display text-[20px] font-black uppercase tracking-[-0.01em]">
-            Duo<span className="text-primary">sync</span>
-          </div>
-        </div>
+        <BrandLogo />
 
         {/* Hero */}
         <section className="flex max-w-[840px] flex-1 flex-col justify-center gap-7 py-10">

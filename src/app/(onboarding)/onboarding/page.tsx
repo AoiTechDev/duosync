@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/auth";
 import { redirect } from "next/navigation";
 import { isProfileComplete } from "@/auth/utils";
 import OnboardingClient from "../../../components/onboarding/OnboardingClient";
+
+export const metadata: Metadata = { title: "Account setup · DuoSync" };
 
 export default async function OnboardingPage() {
   const user = await getCurrentUser();

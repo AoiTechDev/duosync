@@ -95,7 +95,20 @@ export async function POST(request: NextRequest) {
           message: "Account not found",
         });
       }
-      throw new Error("Riot API request failed");
+      if (accountResponse.status === 401 || accountResponse.status === 403) {
+        console.error("Riot API key rejected:", accountResponse.status);
+        return NextResponse.json(
+          { success: false, message: "Riot API key is invalid or expired" },
+          { status: 502 },
+        );
+      }
+      if (accountResponse.status === 429) {
+        return NextResponse.json(
+          { success: false, message: "Too many requests to Riot, try again in a minute" },
+          { status: 429 },
+        );
+      }
+      throw new Error(`Riot API request failed: ${accountResponse.status}`);
     }
 
     const account = await accountResponse.json();
@@ -141,6 +154,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      data: {
+        summonerName: `${account.gameName}#${account.tagLine}`,
+        gameName: account.gameName,
+        tagLine: account.tagLine,
+        level: summoner.summonerLevel,
+        soloRank,
+        flexRank,
+      },
     });
   } catch (error) {
     console.error("Riot API error:", error);
