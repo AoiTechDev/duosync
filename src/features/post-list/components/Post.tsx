@@ -4,16 +4,19 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, Clock, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
+import { ArrowUp, Check, Clock, Hourglass, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
 import type { FeedPost } from "@/lib/db";
 import { ROLES } from "@/data/preferences";
 import { findRegion } from "@/data/regions";
+import { findGameMode } from "@/data/game-modes";
 import { parseRank, tierLabel } from "@/lib/rank";
 import { formatRelativeTime } from "@/lib/utils";
 import { useFormStore } from "@/store/create-post-store";
 import { Button } from "@/components/ui/button";
 import { acceptFriendRequest, sendFriendRequest } from "@/features/friends/api";
-import { deletePost } from "@/app/(dashboard)/posts/actions";
+import { bumpPost, deletePost } from "@/app/(dashboard)/posts/actions";
+import { OnlineDot } from "@/components/presence/OnlineDot";
+import { bumpAvailableAt, formatDuration, isExpired } from "@/lib/post-lifecycle";
 
 const AVATAR_GRADIENTS = [
   "from-primary to-accent",
@@ -44,7 +47,7 @@ function LookingForChip({ label, value, icon }: { label: string; value: string; 
   );
 }
 
-const Post = ({ post }: { post: FeedPost }) => {
+const Post = ({ post, now }: { post: FeedPost; now: number }) => {
   const queryClient = useQueryClient();
   const { setPostId, setShouldOpenEditDialog } = useFormStore();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -53,6 +56,11 @@ const Post = ({ post }: { post: FeedPost }) => {
   const rank = parseRank(author.soloRank);
   const minRank = parseRank(post.rank);
   const region = findRegion(post.region);
+  const mode = findGameMode(post.gameMode);
+  const expired = isExpired(post.expiresAt, now);
+  const timeLeft = new Date(post.expiresAt).getTime() - now;
+  const bumpWait = bumpAvailableAt(post.bumpedAt) - now;
+  const wasBumped = new Date(post.bumpedAt).getTime() - new Date(post.createdAt).getTime() > 60_000;
   const [riotName, riotTag] = (author.summonerName ?? "").split("#");
   const name = author.username || author.name || "Player";
 
@@ -73,6 +81,13 @@ const Post = ({ post }: { post: FeedPost }) => {
       queryClient.invalidateQueries({ queryKey: ["friends", "list"] });
     },
   });
+  const bump = useMutation({
+    mutationFn: async () => {
+      const result = await bumpPost(post.id);
+      if (!result.success) throw new Error(result.error);
+    },
+    onSettled: refresh,
+  });
   const removePost = useMutation({
     mutationFn: async () => {
       const result = await deletePost(post.id);
@@ -86,7 +101,7 @@ const Post = ({ post }: { post: FeedPost }) => {
   return (
     <article
       style={tierStyle}
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card/90 shadow-[0_22px_50px_-28px_color-mix(in_oklab,var(--tier)_70%,transparent)] transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tier)_40%,var(--border))] motion-safe:animate-rise"
+      className={`group relative overflow-hidden rounded-2xl border border-border bg-card/90 ${expired ? "opacity-60 saturate-50 hover:opacity-100 hover:saturate-100" : ""} shadow-[0_22px_50px_-28px_color-mix(in_oklab,var(--tier)_70%,transparent)] transition-[border-color,opacity,filter] duration-200 hover:border-[color-mix(in_oklab,var(--tier)_40%,var(--border))]`}
     >
       <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-(--tier) to-transparent opacity-80" />
       <div className="pointer-events-none absolute -top-28 -right-20 size-72 rounded-full bg-(--tier) opacity-[0.16] blur-3xl" />
@@ -114,6 +129,7 @@ const Post = ({ post }: { post: FeedPost }) => {
                   {name.slice(0, 2).toUpperCase()}
                 </div>
               )}
+              <OnlineDot lastSeenAt={author.lastSeenAt} now={now} className="-top-0.5 -left-0.5 size-3.5" />
               {rank?.icon && (
                 <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border border-border bg-card">
                   <Image src={rank.icon} alt="" width={14} height={14} />
@@ -144,8 +160,14 @@ const Post = ({ post }: { post: FeedPost }) => {
                     {shortRole(author.mainRole)} main
                   </span>
                 )}
+                {mode && (
+                  <span className="inline-flex h-6 items-center rounded-md border border-electric/30 bg-electric/[0.06] px-2 text-xs font-semibold text-electric">
+                    {mode.short}
+                  </span>
+                )}
                 <span className="font-mono text-xs text-muted-foreground">
-                  {formatRelativeTime(post.createdAt)}
+                  {wasBumped ? "bumped " : ""}
+                  {formatRelativeTime(post.bumpedAt)}
                 </span>
               </div>
             </div>
@@ -195,11 +217,32 @@ const Post = ({ post }: { post: FeedPost }) => {
           />
         </div>
 
-        <footer className="mt-5 flex min-h-12 items-center justify-between gap-2 border-t border-border pt-4">
+        <footer className="mt-5 flex min-h-12 flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
           {post.relation === "self" ? (
             <>
-              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">Your post</span>
-              <div className="flex gap-2">
+              <div className="min-w-0">
+                <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">Your post</div>
+                <div
+                  className={`mt-0.5 flex items-center gap-1 text-xs ${expired ? "text-accent" : "text-muted-foreground"}`}
+                >
+                  <Hourglass className="size-3" />
+                  {expired ? "Expired · hidden from the feed" : `Live for ${formatDuration(timeLeft)}`}
+                </div>
+                {(bump.error ?? removePost.error) && (
+                  <div className="mt-0.5 text-xs text-destructive">{(bump.error ?? removePost.error)?.message}</div>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant={expired ? "default" : "secondary"}
+                  disabled={bump.isPending || bumpWait > 0}
+                  title={bumpWait > 0 ? `You can bump again in ${formatDuration(bumpWait)}` : "Move to the top and reset the timer"}
+                  onClick={() => bump.mutate()}
+                >
+                  {bump.isPending ? <Loader2 className="animate-spin" /> : <ArrowUp />}
+                  {bumpWait > 0 ? `Bump in ${formatDuration(bumpWait)}` : "Bump"}
+                </Button>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -225,7 +268,7 @@ const Post = ({ post }: { post: FeedPost }) => {
           ) : (
             <>
               <span className="text-xs text-destructive">
-                {(sendRequest.error ?? acceptRequest.error ?? removePost.error)?.message}
+                {(sendRequest.error ?? acceptRequest.error)?.message}
               </span>
               {post.relation === "friend" ? (
                 <span className="inline-flex h-8 items-center gap-1.5 rounded-[10px] border border-success/40 bg-success/10 px-3 text-xs font-semibold text-success">

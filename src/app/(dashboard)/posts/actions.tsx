@@ -5,6 +5,7 @@ import { posts } from "@/db/schema";
 import { db } from "@/lib/db";
 import { createPostValidator } from "@/validators/create-post-validator";
 import { and, eq } from "drizzle-orm";
+import { bumpAvailableAt, formatDuration, POST_TTL_MS } from "@/lib/post-lifecycle";
 import { revalidatePath } from "next/cache";
 
 interface CreatePostState {
@@ -21,6 +22,7 @@ export async function createPost(
     role: formData.get("role"),
     region: formData.get("region"),
     rank: formData.get("rank"),
+    gameMode: formData.get("gameMode"),
   });
 
   if (!validatedFields.success) {
@@ -48,6 +50,7 @@ export async function createPost(
       rank: validatedFields.data.rank,
       region: validatedFields.data.region,
       role: validatedFields.data.role,
+      gameMode: validatedFields.data.gameMode,
     });
 
     revalidatePath("/posts");
@@ -81,6 +84,7 @@ export async function editPost(
     role: formData.get("role"),
     region: formData.get("region"),
     rank: formData.get("rank"),
+    gameMode: formData.get("gameMode"),
   });
 
   if (!validatedFields.success) {
@@ -109,8 +113,10 @@ export async function editPost(
         rank: validatedFields.data.rank,
         region: validatedFields.data.region,
         role: validatedFields.data.role,
+        gameMode: validatedFields.data.gameMode,
+        updatedAt: new Date(),
       })
-      .where(and(eq(posts.id, postId), eq(posts.authorId, user.id)));
+      .where(and(eq(posts.id, postId), eq(posts.authorId, user.id), eq(posts.isActive, true)));
 
     revalidatePath("/posts");
     return { success: true };
@@ -144,5 +150,37 @@ export async function deletePost(postId: string): Promise<{ success: boolean; er
   } catch (error) {
     console.error(error);
     return { success: false, error: "Failed to delete post" };
+  }
+}
+
+export async function bumpPost(postId: string): Promise<{ success: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "You have to be logged in to bump a post" };
+  }
+
+  try {
+    const post = await db.query.posts.findFirst({
+      where: and(eq(posts.id, postId), eq(posts.authorId, user.id), eq(posts.isActive, true)),
+      columns: { bumpedAt: true },
+    });
+    if (!post) return { success: false, error: "Post not found" };
+
+    const wait = bumpAvailableAt(post.bumpedAt) - Date.now();
+    if (wait > 0) {
+      return { success: false, error: `You can bump again in ${formatDuration(wait)}` };
+    }
+
+    const now = new Date();
+    await db
+      .update(posts)
+      .set({ bumpedAt: now, expiresAt: new Date(now.getTime() + POST_TTL_MS), updatedAt: now })
+      .where(eq(posts.id, postId));
+
+    revalidatePath("/posts");
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: "Failed to bump post" };
   }
 }

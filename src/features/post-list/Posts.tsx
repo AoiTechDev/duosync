@@ -6,13 +6,16 @@ import { AlertCircle, Loader2, Search } from "lucide-react";
 import type { FeedPost, User } from "@/lib/db";
 import { ROLES } from "@/data/preferences";
 import { REGION_OPTIONS } from "@/data/regions";
+import { GAME_MODES } from "@/data/game-modes";
+import { isExpired } from "@/lib/post-lifecycle";
+import { useNow } from "@/hooks/use-now";
 import { parseRank, TIER_ORDER, tierLabel } from "@/lib/rank";
 import { useFormStore } from "@/store/create-post-store";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CreatePost from "@/features/create-post/CreatePost";
 import PostSkeleton from "@/components/PostSkeleton";
-import Post from "./components/Post";
+import { VirtualPostList } from "./components/VirtualPostList";
 import { EditPostDialog } from "./components/EditPostDialog";
 
 const LANES = ROLES.filter((r) => r.id !== "FILL");
@@ -85,6 +88,7 @@ function StateCard({
 }
 
 const Posts = ({ user }: { user: User }) => {
+  const [gameMode, setGameMode] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [minTier, setMinTier] = useState<string | null>(null);
   const [region, setRegion] = useState<string>("ALL");
@@ -99,20 +103,25 @@ const Posts = ({ user }: { user: User }) => {
     },
     retry: (failureCount, error) => !error.message.startsWith("HTTP 4") && failureCount < 2,
     staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
   });
+  const now = useNow();
 
   const filtered = useMemo(() => {
     const minIndex = minTier ? TIER_ORDER.indexOf(minTier as (typeof TIER_ORDER)[number]) : -1;
     return (data?.posts ?? []).filter(
       (p) =>
+        (p.relation === "self" || !isExpired(p.expiresAt, now)) &&
+        (!gameMode || p.gameMode === gameMode) &&
         (!role || p.role === role) &&
         (region === "ALL" || p.region === region) &&
         (minIndex < 0 || (parseRank(p.author.soloRank)?.index ?? -1) >= minIndex),
     );
-  }, [data, role, minTier, region]);
+  }, [data, now, gameMode, role, minTier, region]);
 
-  const hasFilters = !!role || !!minTier || region !== "ALL";
+  const hasFilters = !!gameMode || !!role || !!minTier || region !== "ALL";
   const clearFilters = () => {
+    setGameMode(null);
     setRole(null);
     setMinTier(null);
     setRegion("ALL");
@@ -121,6 +130,23 @@ const Posts = ({ user }: { user: User }) => {
   return (
     <div className="space-y-6">
       <div className="space-y-4 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-sm sm:space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <FilterLabel>Queue</FilterLabel>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip active={!gameMode} onClick={() => setGameMode(null)}>
+              All
+            </FilterChip>
+            {GAME_MODES.map((m) => (
+              <FilterChip
+                key={m.id}
+                active={gameMode === m.id}
+                onClick={() => setGameMode(gameMode === m.id ? null : m.id)}
+              >
+                {m.label}
+              </FilterChip>
+            ))}
+          </div>
+        </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <FilterLabel>Role</FilterLabel>
           <div className="flex flex-wrap gap-2">
@@ -185,7 +211,7 @@ const Posts = ({ user }: { user: User }) => {
       <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
         <span>
           {isLoading ? "Loading requests" : `${filtered.length} duo request${filtered.length === 1 ? "" : "s"}`}{" "}
-          · newest first
+          · latest first
         </span>
         {isFetching && !isLoading && <Loader2 className="size-3.5 animate-spin" />}
       </div>
@@ -227,11 +253,7 @@ const Posts = ({ user }: { user: User }) => {
           </Button>
         </StateCard>
       ) : (
-        <div className="grid items-start gap-5 md:grid-cols-2">
-          {filtered.map((post) => (
-            <Post key={post.id} post={post} />
-          ))}
-        </div>
+        <VirtualPostList posts={filtered} now={now} />
       )}
 
       <EditPostDialog />

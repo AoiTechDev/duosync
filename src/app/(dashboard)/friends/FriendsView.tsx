@@ -11,6 +11,9 @@ import { cancelFriendRequest, removeFriend } from "@/features/friends/api";
 import { ROLES } from "@/data/preferences";
 import { findRegion } from "@/data/regions";
 import { parseRank } from "@/lib/rank";
+import { OnlineDot } from "@/components/presence/OnlineDot";
+import { useNow } from "@/hooks/use-now";
+import { isOnline } from "@/lib/post-lifecycle";
 
 type Friend = {
   id: string;
@@ -22,6 +25,7 @@ type Friend = {
   soloRank: string | null;
   flexRank: string | null;
   mainRole: string | null;
+  lastSeenAt: string | null;
   since: string;
 };
 
@@ -40,7 +44,21 @@ async function getJson<T>(url: string): Promise<T> {
   return res.json();
 }
 
-function Avatar({ name, src, rank, size = 48 }: { name: string; src?: string | null; rank?: string | null; size?: number }) {
+function Avatar({
+  name,
+  src,
+  rank,
+  size = 48,
+  lastSeenAt,
+  now,
+}: {
+  name: string;
+  src?: string | null;
+  rank?: string | null;
+  size?: number;
+  lastSeenAt?: string | null;
+  now?: number;
+}) {
   const parsed = parseRank(rank);
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -50,6 +68,9 @@ function Avatar({ name, src, rank, size = 48 }: { name: string; src?: string | n
         <div className="flex size-full items-center justify-center rounded-full bg-linear-to-br from-primary to-accent text-sm font-black text-primary-foreground">
           {name.slice(0, 2).toUpperCase()}
         </div>
+      )}
+      {lastSeenAt !== undefined && (
+        <OnlineDot lastSeenAt={lastSeenAt} now={now} className="-top-0.5 -left-0.5 size-3.5" />
       )}
       {parsed?.icon && (
         <span className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border border-border bg-card">
@@ -102,7 +123,7 @@ function RiotIdCopy({ summonerName }: { summonerName: string | null }) {
   );
 }
 
-function FriendCard({ friend }: { friend: Friend }) {
+function FriendCard({ friend, now }: { friend: Friend; now: number }) {
   const queryClient = useQueryClient();
   const [confirm, setConfirm] = useState(false);
   const rank = parseRank(friend.soloRank);
@@ -126,7 +147,13 @@ function FriendCard({ friend }: { friend: Friend }) {
       <div className="pointer-events-none absolute -top-24 -right-16 size-56 rounded-full bg-(--tier) opacity-[0.14] blur-3xl" />
 
       <div className="relative flex items-start gap-3">
-        <Avatar name={friend.username} src={friend.image || friend.avatar} rank={friend.soloRank} />
+        <Avatar
+          name={friend.username}
+          src={friend.image || friend.avatar}
+          rank={friend.soloRank}
+          lastSeenAt={friend.lastSeenAt}
+          now={now}
+        />
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-bold">
             <Link href={`/players/${encodeURIComponent(friend.username)}`} className="hover:text-primary hover:underline">
@@ -245,9 +272,13 @@ export function FriendsView() {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: FRIENDS_KEY,
     queryFn: () => getJson<{ items: Friend[] }>("/api/friends"),
+    refetchInterval: 60 * 1000,
   });
   const inbound = useInboundRequests();
-  const friends = data?.items ?? [];
+  const now = useNow();
+  const friends = [...(data?.items ?? [])].sort(
+    (a, b) => Number(isOnline(b.lastSeenAt, now)) - Number(isOnline(a.lastSeenAt, now)),
+  );
 
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 pt-10 pb-20">
@@ -294,7 +325,7 @@ export function FriendsView() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {friends.map((f) => (
-                <FriendCard key={f.id} friend={f} />
+                <FriendCard key={f.id} friend={f} now={now} />
               ))}
             </div>
           )}

@@ -41,7 +41,7 @@ const CreatePost = ({ user }: { user: User }) => {
         <DialogContent showCloseButton={false} className={postDialogClass}>
           <PostForm
             mode="create"
-            initial={{ description: "", role: null, rank: null, region: user.region ?? null }}
+            initial={{ description: "", gameMode: "RANKED_SOLO", role: null, rank: null, region: user.region ?? null }}
             onDone={() => setShouldOpenCreateDialog(false)}
           />
         </DialogContent>

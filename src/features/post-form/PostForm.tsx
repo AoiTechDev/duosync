@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { ROLES } from "@/data/preferences";
 import { REGION_OPTIONS } from "@/data/regions";
+import { GAME_MODES } from "@/data/game-modes";
 import { parseRank, TIER_ORDER, tierLabel } from "@/lib/rank";
 import { createPost, editPost } from "@/app/(dashboard)/posts/actions";
 
@@ -18,6 +19,7 @@ type ActionState = { errors?: Record<string, string[]>; success?: boolean } | un
 
 export interface PostFormValues {
   description: string;
+  gameMode: string | null;
   role: string | null;
   rank: string | null;
   region: string | null;
@@ -71,6 +73,7 @@ export function PostForm({
   return (
     <form action={formAction}>
       {postId && <input type="hidden" name="postId" value={postId} />}
+      <input type="hidden" name="gameMode" value={values.gameMode ?? ""} />
       <input type="hidden" name="role" value={values.role ?? ""} />
       <input type="hidden" name="rank" value={values.rank ?? ""} />
       <input type="hidden" name="region" value={values.region ?? ""} />
@@ -115,6 +118,30 @@ export function PostForm({
             placeholder="Who are you looking for? Champions, schedule, how you like to play."
             className="w-full resize-none rounded-xl border border-border bg-background/60 px-4 py-3 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/50 focus:border-primary/60 focus:ring-4 focus:ring-primary/10"
           />
+        </Field>
+
+        <Field label="Queue" error={error("gameMode")}>
+          <div role="radiogroup" aria-label="Queue" className="grid grid-cols-2 gap-1 rounded-xl border border-border bg-background/40 p-1 sm:grid-cols-4">
+            {GAME_MODES.map((mode) => {
+              const selected = values.gameMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => set("gameMode", mode.id)}
+                  className={`h-9 cursor-pointer rounded-lg text-xs font-semibold transition-colors ${
+                    selected
+                      ? "bg-primary/[0.1] text-primary shadow-[inset_0_0_0_1px_var(--primary)]"
+                      : "text-muted-foreground hover:bg-popover hover:text-foreground"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
         </Field>
 
         <Field label="Looking for role" error={error("role")}>

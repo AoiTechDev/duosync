@@ -34,6 +34,7 @@ export async function GET() {
             soloRank: users.soloRank,
             flexRank: users.flexRank,
             mainRole: users.mainRole,
+            lastSeenAt: users.lastSeenAt,
           })
           .from(users)
           .where(inArray(users.id, [...sinceById.keys()]))

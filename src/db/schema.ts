@@ -72,6 +72,7 @@ export const regionEnum = pgEnum("region", regions as [string, ...string[]]);
 export type Region = (typeof regionEnum.enumValues)[number];
 
 export const gameModeEnum = pgEnum("game_mode", ["RANKED_SOLO", "RANKED_FLEX", "NORMAL", "ARAM"]);
+export type GameMode = (typeof gameModeEnum.enumValues)[number];
 
 export const friendshipStatusEnum = pgEnum("friendship_status", [
   "PENDING",
@@ -104,6 +105,7 @@ export const users = pgTable("users", {
   communication: json("communication").$type<string[]>(),
   goals: json("goals").$type<string[]>(),
   availability: json("availability"),
+  lastSeenAt: timestamp("last_seen_at"),
 });
 
 export type User = typeof users.$inferSelect;
@@ -156,9 +158,13 @@ export const posts = pgTable("posts", {
   id: uuid("id").primaryKey().defaultRandom(),
   description: text("description"),
   isActive: boolean("is_active").default(true).notNull(),
-  expiresAt: timestamp("expires_at"),
+  expiresAt: timestamp("expires_at")
+    .default(sql`now() + interval '2 hours'`)
+    .notNull(),
+  bumpedAt: timestamp("bumped_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  gameMode: gameModeEnum("game_mode").default("RANKED_SOLO").notNull(),
   rank: rankMinEnum("rank_min").notNull(),
   region: regionEnum("region").notNull(),
   role: roleEnum("role").notNull(),

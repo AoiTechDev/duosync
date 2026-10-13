@@ -38,6 +38,7 @@ export default async function PlayerPage({ params }: Props) {
       goals: users.goals,
       playstyle: users.playstyle,
       communication: users.communication,
+      lastSeenAt: users.lastSeenAt,
     })
     .from(users)
     .where(eq(users.username, username))

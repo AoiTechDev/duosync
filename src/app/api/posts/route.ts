@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/auth";
 import { friendRequests, friendships, posts, users } from "@/db/schema";
 import { db } from "@/lib/db";
-import { and, desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, gt, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -35,11 +35,13 @@ export async function GET() {
           description: posts.description,
           isActive: posts.isActive,
           expiresAt: posts.expiresAt,
+          bumpedAt: posts.bumpedAt,
           createdAt: posts.createdAt,
           updatedAt: posts.updatedAt,
           rank: posts.rank,
           region: posts.region,
           role: posts.role,
+          gameMode: posts.gameMode,
           authorId: posts.authorId,
           author: {
             id: users.id,
@@ -52,12 +54,18 @@ export async function GET() {
             flexRank: users.flexRank,
             mainRole: users.mainRole,
             secondaryRole: users.secondaryRole,
+            lastSeenAt: users.lastSeenAt,
           },
         })
         .from(posts)
         .innerJoin(users, eq(posts.authorId, users.id))
-        .where(eq(posts.isActive, true))
-        .orderBy(desc(posts.createdAt)),
+        .where(
+          and(
+            eq(posts.isActive, true),
+            or(gt(posts.expiresAt, sql`now()`), eq(posts.authorId, me.id)),
+          ),
+        )
+        .orderBy(desc(posts.bumpedAt)),
     ]);
 
     const friendIds = new Set(

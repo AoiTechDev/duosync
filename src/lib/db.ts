@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "@/db/schema";
-import { type Rank } from "@/db/schema";
+import { type GameMode, type Rank } from "@/db/schema";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not defined");
@@ -24,12 +24,14 @@ export type PostWithAuthor = {
   id: string;
   description: string | null;
   isActive: boolean;
-  expiresAt: Date | null;
+  expiresAt: Date;
+  bumpedAt: Date;
   createdAt: Date;
   updatedAt: Date;
   rank: Rank;
   role: string;
   region: string;
+  gameMode: GameMode;
   authorId: string;
   author: {
     id: string;
@@ -42,6 +44,7 @@ export type PostWithAuthor = {
     flexRank: Rank | null;
     mainRole: string | null;
     secondaryRole: string | null;
+    lastSeenAt: Date | null;
   };
 };
 

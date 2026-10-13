@@ -10,6 +10,8 @@ import { parseRank } from "@/lib/rank";
 import { getUserInitials } from "@/auth";
 import { RiotLinkCard } from "./RiotLinkCard";
 import { ProfileAction } from "./ProfileAction";
+import { OnlineDot } from "@/components/presence/OnlineDot";
+import { isOnline } from "@/lib/post-lifecycle";
 
 const nameOf = (list: { id: string; name: string }[], id: string) => list.find((x) => x.id === id)?.name ?? id;
 const role = (id?: string | null) => ROLES.find((r) => r.id === id);
@@ -82,6 +84,7 @@ export type PublicProfile = Pick<
   | "goals"
   | "playstyle"
   | "communication"
+  | "lastSeenAt"
 >;
 
 export function ProfileView({
@@ -92,6 +95,7 @@ export function ProfileView({
   viewer?: { relation: PostRelation; requestId?: string };
 }) {
   const isOwner = !viewer;
+  const online = !isOwner && isOnline(user.lastSeenAt);
   const solo = parseRank(user.soloRank);
   const region = findRegion(user.region);
   const [riotName, riotTag] = (user.summonerName ?? "").split("#");
@@ -121,6 +125,7 @@ export function ProfileView({
                   </div>
                 )}
               </div>
+              {!isOwner && <OnlineDot lastSeenAt={user.lastSeenAt} className="top-1 left-1 size-5" />}
               {solo?.icon && (
                 <div className="absolute -right-1 -bottom-1 flex size-8 items-center justify-center rounded-full border border-border bg-card">
                   <Image src={solo.icon} alt="" width={22} height={22} />
@@ -129,7 +134,16 @@ export function ProfileView({
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                <span className="size-1.5 rounded-full bg-electric shadow-[0_0_8px_var(--electric)]" /> Player card
+                {online ? (
+                  <>
+                    <span className="size-1.5 rounded-full bg-success shadow-[0_0_8px_var(--success)]" />
+                    <span className="text-success">Online now</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="size-1.5 rounded-full bg-electric shadow-[0_0_8px_var(--electric)]" /> Player card
+                  </>
+                )}
               </div>
               <h1 className="mt-1 truncate font-display text-[clamp(36px,6vw,72px)] font-black uppercase leading-[0.95] tracking-[-0.03em]">
                 {user.username}

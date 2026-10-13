@@ -11,7 +11,14 @@ function EditPostForm({ postId, onDone }: { postId: string; onDone: () => void }
     queryFn: async () => {
       const res = await fetch(`/api/get-post/${postId}`);
       if (!res.ok) throw new Error("Failed to load post");
-      return res.json() as Promise<{ id: string; description: string | null; role: string; rank: string; region: string }>;
+      return res.json() as Promise<{
+        id: string;
+        description: string | null;
+        gameMode: string;
+        role: string;
+        rank: string;
+        region: string;
+      }>;
     },
   });
 
@@ -29,7 +36,13 @@ function EditPostForm({ postId, onDone }: { postId: string; onDone: () => void }
       key={data.id}
       mode="edit"
       postId={postId}
-      initial={{ description: data.description ?? "", role: data.role, rank: data.rank, region: data.region }}
+      initial={{
+        description: data.description ?? "",
+        gameMode: data.gameMode,
+        role: data.role,
+        rank: data.rank,
+        region: data.region,
+      }}
       onDone={onDone}
     />
   );
