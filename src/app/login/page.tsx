@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/auth";
+import { isDemoLoginEnabled } from "@/auth/demo";
 import { AuthButtons } from "@/components/auth/AuthButtons";
 import EmblemField from "./EmblemField";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -52,7 +53,7 @@ const LoginPage = async () => {
           </p>
 
           <div className="w-full max-w-[360px] space-y-4">
-            <AuthButtons />
+            <AuthButtons demo={isDemoLoginEnabled()} />
             <p className="text-xs text-muted-foreground">
               By continuing you agree to the{" "}
               <span className="text-electric underline underline-offset-2">Terms</span> and{" "}

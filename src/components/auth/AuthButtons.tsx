@@ -4,8 +4,9 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { SiDiscord } from "react-icons/si";
+import { FlaskConical } from "lucide-react";
 
-export function AuthButtons() {
+export function AuthButtons({ demo = false }: { demo?: boolean }) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -35,6 +36,23 @@ export function AuthButtons() {
           <FcGoogle className="size-5" />
           Continue with Google
         </Button>
+        {demo && (
+          <>
+            <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              Dev only
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => signIn("demo", { callbackUrl: "/feed" })}
+            >
+              <FlaskConical className="size-5" />
+              Continue as demo player
+            </Button>
+          </>
+        )}
       </div>
     );
   }

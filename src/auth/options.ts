@@ -1,6 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { getOrCreateDemoUser, isDemoLoginEnabled } from "./demo";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -36,6 +38,20 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
       issuer: "https://discord.com",
     }),
+    ...(isDemoLoginEnabled()
+      ? [
+          CredentialsProvider({
+            id: "demo",
+            name: "Demo player",
+            credentials: {},
+            async authorize() {
+              if (!isDemoLoginEnabled()) return null;
+              const demo = await getOrCreateDemoUser();
+              return { id: demo.id, email: demo.email, name: demo.username, username: demo.username };
+            },
+          }),
+        ]
+      : []),
   ],
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
@@ -44,6 +60,9 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
+      if (account?.provider === "demo") {
+        return isDemoLoginEnabled();
+      }
       if (!user.email || !hasVerifiedEmail(account?.provider, profile)) {
         return false;
       }
