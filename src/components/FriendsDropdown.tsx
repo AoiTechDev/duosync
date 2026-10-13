@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Loader2, UserPlus } from "lucide-react";
+import { Check, Loader2, UserPlus, X } from "lucide-react";
+import { acceptFriendRequest, declineFriendRequest } from "@/features/friends/api";
 
 const FriendsDropdown = () => {
   const { data, isLoading, isError, refetch } = useQuery({
@@ -20,6 +21,29 @@ const FriendsDropdown = () => {
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
+
+  const queryClient = useQueryClient();
+
+  const acceptMutation = useMutation({
+    mutationFn: (requestId: string) => acceptFriendRequest(requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "inbound"] });
+    },
+    onError: (error) => {
+      console.error(error.message); // swap for a toast later
+    },
+  });
+
+  const declineMutation = useMutation({
+    mutationFn: (requestId: string) => declineFriendRequest(requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "inbound"] });
+    },
+    onError: (error) => {
+      console.error(error.message); // swap for a toast later
+    },
+  });
+
 
   const items = data?.items ?? [];
 
@@ -49,7 +73,8 @@ const FriendsDropdown = () => {
           ) : (
             <ul className="divide-y">
               {items.map((r) => (
-                <li key={r.id} className="p-3 flex items-center gap-3">
+
+                <li key={r.id} className="p-3 flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={r.otherUser.image || undefined} />
                     <AvatarFallback>{r.otherUser.username?.slice(0, 2)?.toUpperCase()}</AvatarFallback>
@@ -57,6 +82,18 @@ const FriendsDropdown = () => {
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{r.otherUser.username ?? "Unknown"}</div>
                     <div className="text-xs text-muted-foreground">sent a friend request</div>
+                  </div>
+
+
+                  <div className="space-x-2">
+
+                    <Button size="icon" variant="default" onClick={() => acceptMutation.mutate(r.id)}>{acceptMutation.isPending ? <Loader2 /> : <Check />}</Button>
+                    <Button size="icon" variant="outline" onClick={() => {
+                      console.log(r.id)
+                      declineMutation.mutate(r.id)
+
+                    }}>{declineMutation.isPending ? <Loader2 className="anima" /> : <X />}</Button>
+
                   </div>
                 </li>
               ))}

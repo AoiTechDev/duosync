@@ -1,10 +1,19 @@
-import { posts, users } from "@/db/schema";
+import { getCurrentUser } from "@/auth";
+import { friendships, posts, users } from "@/db/schema";
 import { db } from "@/lib/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
+    const me = await getCurrentUser();
+    if (!me) return;
+
+    const friend = await db.query.friendships.findFirst({
+      where: or(eq(friendships.userAId, me.id), eq(friendships.userBId, me.id)),
+    });
+
+
     const postsResponse = await db
       .select({
         id: posts.id,
@@ -35,12 +44,13 @@ export async function GET() {
       .where(eq(posts.isActive, true))
       .orderBy(desc(posts.createdAt));
 
-    return NextResponse.json(postsResponse);
+      
+    return NextResponse.json({ posts: postsResponse, friend: friend });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

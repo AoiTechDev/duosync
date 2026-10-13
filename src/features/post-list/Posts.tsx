@@ -112,6 +112,7 @@ const Posts = ({ user }: { user: User }) => {
     gcTime: 10 * 60 * 1000,
   });
 
+  console.log(data)
   const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } = useFormStore();
 
   if (isLoading) {
@@ -135,9 +136,9 @@ const Posts = ({ user }: { user: User }) => {
         </div>
       )}
 
-      {data && data.length > 0 ? (
+      {data.posts && data.posts.length > 0 ? (
         <>
-          {data.map((post: PostWithAuthor) => (
+          {data.posts.map((post: PostWithAuthor) => (
             <Post key={post.id} post={post} user={user} />
           ))}
           <Dialog

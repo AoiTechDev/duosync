@@ -14,6 +14,8 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID as string,
       clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+      // Discord sends `iss` on the OAuth callback; next-auth v4 needs this to validate it.
+      issuer: "https://discord.com",
     }),
   ],
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
