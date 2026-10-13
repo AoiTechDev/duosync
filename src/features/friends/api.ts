@@ -18,7 +18,7 @@ export async function sendFriendRequest(toUserId: string) {
 }
 
 export async function acceptFriendRequest(requestId: string) {
-  const res = await fetch("api/friends/accept", {
+  const res = await fetch("/api/friends/accept", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ requestId }),
@@ -36,7 +36,7 @@ export async function acceptFriendRequest(requestId: string) {
   return res.json();
 }
 export async function declineFriendRequest(requestId: string) {
-  const res = await fetch("api/friends/decline", {
+  const res = await fetch("/api/friends/decline", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ requestId }),

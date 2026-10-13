@@ -1,43 +1,52 @@
 "use client";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import Form from "./components/Form";
-import { User } from "@/db/schema";
+import Image from "next/image";
 import { Plus } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { User } from "@/db/schema";
 import { useFormStore } from "@/store/create-post-store";
+import { PostForm, postDialogClass } from "@/features/post-form/PostForm";
 
 const CreatePost = ({ user }: { user: User }) => {
   const { shouldOpenCreateDialog, setShouldOpenCreateDialog } = useFormStore();
+
   return (
-    <Dialog open={shouldOpenCreateDialog} onOpenChange={setShouldOpenCreateDialog}>
-      <DialogTrigger asChild>
-        <Card className="mb-8 cursor-pointer group hover:scale-[1.02] max-w-2xl mx-auto transition-all duration-300 border-2 border-dashed border-primary/30 hover:border-primary/60 bg-gradient-to-r from-card/50 to-card/80 backdrop-blur-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Plus className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <div className="flex-1">
-                <div className="text-lg font-semibold text-foreground mb-1">Create Duo Request</div>
-                <div className="text-sm text-muted-foreground">
-                  Share your playstyle and find the perfect partner...
-                </div>
-              </div>
-              <div className="text-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-                ⚡
-              </div>
+    <>
+      <section className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-linear-to-r from-primary/[0.07] via-card/80 to-card/80 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="pointer-events-none absolute -right-10 bottom-0 h-full w-56 -skew-x-[24deg] bg-linear-to-r from-transparent via-accent/10 to-transparent" />
+        <div className="relative flex items-center gap-4">
+          <div className="relative hidden h-12 w-[76px] shrink-0 sm:block">
+            <div className="absolute top-1 left-0 flex size-10 items-center justify-center rounded-lg border border-primary/30 bg-card">
+              <Image src="/lane-icons/mid-icon.png" alt="" width={22} height={22} />
             </div>
-          </CardContent>
-        </Card>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogTitle>Create your post</DialogTitle>
-        <Form user={user as User} />
-      </DialogContent>
-    </Dialog>
+            <div className="absolute top-0 left-7 size-12">
+              <Image src="/ranks/DIAMOND.png" alt="" fill sizes="48px" className="object-contain" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-xl font-black uppercase tracking-[-0.02em] sm:text-2xl">
+              Post a duo request
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Say what you need: role, minimum rank, region. Your rank card does the rest.
+            </p>
+          </div>
+        </div>
+        <Button className="relative shrink-0" onClick={() => setShouldOpenCreateDialog(true)}>
+          <Plus /> Create request
+        </Button>
+      </section>
+
+      <Dialog open={shouldOpenCreateDialog} onOpenChange={setShouldOpenCreateDialog}>
+        <DialogContent showCloseButton={false} className={postDialogClass}>
+          <PostForm
+            mode="create"
+            initial={{ description: "", role: null, rank: null, region: user.region ?? null }}
+            onDone={() => setShouldOpenCreateDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

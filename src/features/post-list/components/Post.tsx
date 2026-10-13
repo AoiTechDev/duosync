@@ -1,159 +1,244 @@
 "use client";
 
-import { PostWithAuthor, User } from "@/lib/db";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, EllipsisVertical, UserPlus } from "lucide-react";
-import { RANKS, ROLES } from "@/data/preferences";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
-import { regionsWithFlags } from "@/data/constants";
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Check, Clock, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
+import type { FeedPost } from "@/lib/db";
+import { ROLES } from "@/data/preferences";
+import { findRegion } from "@/data/regions";
+import { parseRank, tierLabel } from "@/lib/rank";
+import { formatRelativeTime } from "@/lib/utils";
 import { useFormStore } from "@/store/create-post-store";
 import { Button } from "@/components/ui/button";
-import { sendFriendRequest } from "@/features/friends/api";
-import { formatRelativeTime, stripRankName } from "@/lib/utils";
+import { acceptFriendRequest, sendFriendRequest } from "@/features/friends/api";
+import { deletePost } from "@/app/(dashboard)/posts/actions";
 
-const Post = ({ post, user }: { post: PostWithAuthor; user: User }) => {
-  const isOwner = user?.id === post.author.id;
+const AVATAR_GRADIENTS = [
+  "from-primary to-accent",
+  "from-electric to-glow",
+  "from-glow to-[#ff5fa2]",
+  "from-success to-electric",
+  "from-accent to-destructive",
+];
 
+function gradientFor(name: string) {
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
+  return AVATAR_GRADIENTS[Math.abs(hash) % AVATAR_GRADIENTS.length];
+}
+
+const roleOf = (id?: string | null) => ROLES.find((r) => r.id === id);
+const shortRole = (id?: string | null) => roleOf(id)?.name.replace(" Lane", "") ?? id ?? "";
+
+function LookingForChip({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5 rounded-xl border border-border bg-popover/50 p-2.5">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-card">{icon}</div>
+      <div className="min-w-0">
+        <div className="text-[11px] text-muted-foreground">{label}</div>
+        <div className="truncate text-sm font-semibold">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+const Post = ({ post }: { post: FeedPost }) => {
+  const queryClient = useQueryClient();
   const { setPostId, setShouldOpenEditDialog } = useFormStore();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const author = post.author;
+  const rank = parseRank(author.soloRank);
+  const minRank = parseRank(post.rank);
+  const region = findRegion(post.region);
+  const [riotName, riotTag] = (author.summonerName ?? "").split("#");
+  const name = author.username || author.name || "Player";
+
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ["posts"] });
+
+  const sendRequest = useMutation({
+    mutationFn: () => sendFriendRequest(author.id),
+    onSettled: refresh,
+  });
+  const acceptRequest = useMutation({
+    mutationFn: () => acceptFriendRequest(post.requestId!),
+    onSettled: () => {
+      refresh();
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "inbound"] });
+    },
+  });
+  const removePost = useMutation({
+    mutationFn: async () => {
+      const result = await deletePost(post.id);
+      if (!result.success) throw new Error(result.error);
+    },
+    onSettled: refresh,
+  });
+
+  const tierStyle = { "--tier": rank?.color ?? "var(--muted-fg)" } as CSSProperties;
 
   return (
-    <Card key={post.id} className="group max-w-2xl mx-auto  border border-border/30  bg-card">
-      <CardHeader className="pb-4">
-        <div className="flex items-start gap-4">
-          <div className="relative">
-            <Avatar className="h-14 w-14  ">
-              <AvatarImage
-                src={post.author.image || post.author.avatar || ""}
-                alt={`${post.author.username}'s avatar`}
-              />
-              <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold">
-                {post.author.name?.slice(0, 2)}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-          <div className="flex-1 relative">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="font-bold text-lg text-foreground ">{post.author.username}</h3>
-              <Badge className={` text-white text-xs px-3 py-1 font-semibold shadow-md`}>
-                {post.author.mainRole}
-              </Badge>
-              {post.author.soloRank && (
+    <article
+      style={tierStyle}
+      className="group relative overflow-hidden rounded-2xl border border-border bg-card/90 shadow-[0_22px_50px_-28px_color-mix(in_oklab,var(--tier)_70%,transparent)] transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tier)_40%,var(--border))] motion-safe:animate-rise"
+    >
+      {/* Tier edge + glow */}
+      <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-(--tier) to-transparent opacity-80" />
+      <div className="pointer-events-none absolute -top-28 -right-20 size-72 rounded-full bg-(--tier) opacity-[0.16] blur-3xl" />
+
+      <div className="relative p-5">
+        <header className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="relative shrink-0">
+              {author.image || author.avatar ? (
                 <Image
-                  src={`/ranks/${stripRankName(post.author.soloRank)}.png`}
-                  width={50}
-                  height={50}
-                  alt="rank"
+                  src={(author.image || author.avatar)!}
+                  alt=""
+                  width={44}
+                  height={44}
+                  className="size-11 rounded-full object-cover"
                 />
+              ) : (
+                <div
+                  className={`flex size-11 items-center justify-center rounded-full bg-linear-to-br ${gradientFor(name)} text-sm font-black text-primary-foreground`}
+                >
+                  {name.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+              {rank?.icon && (
+                <div className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border border-border bg-card">
+                  <Image src={rank.icon} alt="" width={14} height={14} />
+                </div>
               )}
             </div>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {formatRelativeTime(post.createdAt)}
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-baseline gap-x-2">
+                <h3 className="truncate font-bold">{name}</h3>
+                {riotName && (
+                  <span className="truncate font-mono text-xs text-muted-foreground">
+                    {riotName}
+                    {riotTag && <span className="text-electric">#{riotTag}</span>}
+                  </span>
+                )}
+              </div>
+              <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                {author.mainRole && (
+                  <span className="inline-flex h-6 items-center gap-1.5 rounded-md border border-border bg-popover/60 px-2 text-xs font-semibold">
+                    {roleOf(author.mainRole) && (
+                      <Image src={roleOf(author.mainRole)!.icon} alt="" width={13} height={13} />
+                    )}
+                    {shortRole(author.mainRole)} main
+                  </span>
+                )}
+                <span className="font-mono text-xs text-muted-foreground">
+                  {formatRelativeTime(post.createdAt)}
+                </span>
               </div>
             </div>
+          </div>
 
-            {isOwner && (
-              <div className="absolute top-0 right-0">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="cursor-pointer">
-                    <EllipsisVertical className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setPostId(post.id);
-                        setShouldOpenEditDialog(true);
-                      }}
-                    >
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>Delete</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+          <div className="flex w-24 shrink-0 flex-col items-center">
+            {rank?.icon ? (
+              <div className="relative size-14">
+                <div className="absolute inset-1 rounded-full bg-(--tier) opacity-40 blur-xl" />
+                <Image src={rank.icon} alt="" fill sizes="56px" className="object-contain" />
               </div>
+            ) : (
+              <div className="flex size-14 items-center justify-center rounded-full border border-dashed border-border" />
             )}
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="pt-0 space-y-4">
-        <p className="text-foreground leading-relaxed text-base font-medium">{post.description}</p>
-
-        <div className="bg-gradient-to-r from-muted/20 to-muted/10 rounded-xl p-4 border border-border/20">
-          <div className="flex items-center gap-2 mb-3">
-            <h4 className="text-sm font-bold text-foreground">Looking for:</h4>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center`}>
-                <Image
-                  src={ROLES.find((r) => r.id === post.role)?.icon || ""}
-                  alt={post.author.mainRole || ""}
-                  width={32}
-                  height={32}
-                />
-              </div>
-              <span className="font-semibold text-foreground">{post.role}</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center`}>
-                <Image
-                  src={RANKS.find((r) => r.id === post.rank)?.icon || ""}
-                  alt={post.rank || ""}
-                  width={32}
-                  height={32}
-                />
-              </div>
-              <span className="font-medium">{post.rank}</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              {regionsWithFlags.find((r) => r.value === post.region)?.flag}
-              <span className="font-medium">{post.region}</span>
+            <div className="mt-1 text-center font-display text-[10px] font-black uppercase tracking-wide">
+              {rank?.label ?? "Unranked"}
             </div>
           </div>
-        </div>
+        </header>
 
-        {!isOwner && (
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground"></div>
-
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                onClick={async () => {
-                  try {
-                    const result = await sendFriendRequest(post.author.id);
-
-                    console.log(result);
-                  } catch {}
-                }}
-              >
-                <UserPlus className="h-4 w-4 mr-1" />
-                Send Request
-              </Button>
-              {/* <Button
-              size="sm"
-              variant="outline"
-              className="bg-background/50 border-border/50 hover:bg-card hover:border-primary/50 transition-all duration-300"
-            >
-              <MessageCircle className="h-4 w-4 mr-1" />
-              Message
-            </Button> */}
-            </div>
-          </div>
+        {post.description && (
+          <p className="mt-4 text-[15px] leading-relaxed text-foreground/90">{post.description}</p>
         )}
-      </CardContent>
-    </Card>
+
+        <div className="mt-5 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+          Looking for
+        </div>
+        <div className="mt-2.5 grid grid-cols-1 gap-2 min-[440px]:grid-cols-3">
+          <LookingForChip
+            label="Role"
+            value={shortRole(post.role)}
+            icon={
+              roleOf(post.role) ? <Image src={roleOf(post.role)!.icon} alt="" width={18} height={18} /> : null
+            }
+          />
+          <LookingForChip
+            label="Min rank"
+            value={minRank ? `${tierLabel(minRank.tier)}+` : "Any"}
+            icon={minRank?.icon ? <Image src={minRank.icon} alt="" width={22} height={22} /> : null}
+          />
+          <LookingForChip
+            label="Region"
+            value={region?.label ?? post.region}
+            icon={
+              <span className="font-mono text-[9px] font-bold text-electric">{region?.code ?? post.region}</span>
+            }
+          />
+        </div>
+
+        <footer className="mt-5 flex min-h-12 items-center justify-between gap-2 border-t border-border pt-4">
+          {post.relation === "self" ? (
+            <>
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">Your post</span>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setPostId(post.id);
+                    setShouldOpenEditDialog(true);
+                  }}
+                >
+                  <Pencil /> Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={removePost.isPending}
+                  onClick={() => (confirmDelete ? removePost.mutate() : setConfirmDelete(true))}
+                  onBlur={() => setConfirmDelete(false)}
+                >
+                  {removePost.isPending ? <Loader2 className="animate-spin" /> : <Trash2 />}
+                  {confirmDelete ? "Confirm delete" : "Delete"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <span className="text-xs text-destructive">
+                {(sendRequest.error ?? acceptRequest.error ?? removePost.error)?.message}
+              </span>
+              {post.relation === "friend" ? (
+                <span className="inline-flex h-8 items-center gap-1.5 rounded-[10px] border border-success/40 bg-success/10 px-3 text-xs font-semibold text-success">
+                  <Check className="size-4" /> Friends
+                </span>
+              ) : post.relation === "sent" ? (
+                <Button size="sm" variant="ghost" disabled>
+                  <Clock /> Request sent
+                </Button>
+              ) : post.relation === "incoming" ? (
+                <Button size="sm" disabled={acceptRequest.isPending} onClick={() => acceptRequest.mutate()}>
+                  {acceptRequest.isPending ? <Loader2 className="animate-spin" /> : <Check />}
+                  Accept request
+                </Button>
+              ) : (
+                <Button size="sm" disabled={sendRequest.isPending} onClick={() => sendRequest.mutate()}>
+                  {sendRequest.isPending ? <Loader2 className="animate-spin" /> : <UserPlus />}
+                  Send request
+                </Button>
+              )}
+            </>
+          )}
+        </footer>
+      </div>
+    </article>
   );
 };
 

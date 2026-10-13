@@ -178,7 +178,7 @@ export default function RiotAccountStep() {
           >
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
               <div className="flex items-center gap-3">
-                <span className="font-mono text-lg font-bold">
+                <span className="font-mono text-[18px] font-bold">
                   {data.gameName}
                   <span className="text-electric">#{data.tagLine?.toUpperCase()}</span>
                 </span>

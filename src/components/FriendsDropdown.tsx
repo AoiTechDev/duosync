@@ -1,129 +1,45 @@
 "use client";
-import React from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { UserPlus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Check, Loader2, UserPlus, X } from "lucide-react";
-import { acceptFriendRequest, declineFriendRequest } from "@/features/friends/api";
+import { FriendRequestsList, useInboundRequests } from "./friends/FriendRequestsList";
+
+export function RequestCount({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary-foreground shadow-[0_0_10px_var(--accent)]">
+      {count}
+    </span>
+  );
+}
 
 const FriendsDropdown = () => {
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["friends", "requests", "inbound"],
-    queryFn: async () => {
-      const res = await fetch(`/api/friends/request?direction=inbound&limit=10`, {
-        cache: "no-store",
-      });
-      if (!res.ok) throw new Error("Failed to load requests");
-      return res.json() as Promise<{
-        items: {
-          id: string;
-          createdAt: string;
-          status: string;
-          otherUser: { id: string; username: string | null; image: string | null };
-        }[];
-      }>;
-    },
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  });
-
-  const queryClient = useQueryClient();
-
-  const acceptMutation = useMutation({
-    mutationFn: (requestId: string) => acceptFriendRequest(requestId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "inbound"] });
-    },
-    onError: (error) => {
-      console.error(error.message); // swap for a toast later
-    },
-  });
-
-  const declineMutation = useMutation({
-    mutationFn: (requestId: string) => declineFriendRequest(requestId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "inbound"] });
-    },
-    onError: (error) => {
-      console.error(error.message); // swap for a toast later
-    },
-  });
-
-  const items = data?.items ?? [];
+  const { data } = useInboundRequests();
+  const count = data?.items.length ?? 0;
 
   return (
     <Popover>
-      <PopoverTrigger className="relative inline-flex items-center">
-        <UserPlus className="h-5 w-5" />
-        {items.length > 0 && (
-          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-xs px-1.5 min-w-5 h-5">
-            {items.length}
-          </span>
-        )}
+      <PopoverTrigger
+        aria-label={`Friend requests${count ? ` (${count})` : ""}`}
+        className="relative flex size-9 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-card/70 text-foreground/85 transition-colors hover:border-input hover:bg-popover hover:text-foreground data-[state=open]:border-primary/60 data-[state=open]:text-primary"
+      >
+        <UserPlus className="size-[18px]" />
+        <span className="absolute -top-1.5 -right-1.5">
+          <RequestCount count={count} />
+        </span>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0">
-        <div className="p-3 border-b text-sm font-semibold">Friend requests</div>
-        <div className="max-h-80 overflow-y-auto">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Loading...
-            </div>
-          ) : isError ? (
-            <div className="p-4 text-sm text-red-600">
-              Failed to load.{" "}
-              <button className="underline" onClick={() => refetch()}>
-                Retry
-              </button>
-            </div>
-          ) : items.length === 0 ? (
-            <div className="p-4 text-sm text-muted-foreground">No pending requests</div>
-          ) : (
-            <ul className="divide-y">
-              {items.map((r) => (
-                <li key={r.id} className="p-3 flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={r.otherUser.image || undefined} />
-                    <AvatarFallback>
-                      {r.otherUser.username?.slice(0, 2)?.toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">
-                      {r.otherUser.username ?? "Unknown"}
-                    </div>
-                    <div className="text-xs text-muted-foreground">sent a friend request</div>
-                  </div>
-
-                  <div className="space-x-2">
-                    <Button
-                      size="icon"
-                      variant="default"
-                      onClick={() => acceptMutation.mutate(r.id)}
-                    >
-                      {acceptMutation.isPending ? <Loader2 /> : <Check />}
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => {
-                        console.log(r.id);
-                        declineMutation.mutate(r.id);
-                      }}
-                    >
-                      {declineMutation.isPending ? <Loader2 className="anima" /> : <X />}
-                    </Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+      <PopoverContent
+        align="end"
+        sideOffset={10}
+        className="w-[340px] overflow-hidden rounded-2xl border-border bg-popover/95 p-0 shadow-[0_24px_60px_-20px_rgb(0_0_0/0.8)] backdrop-blur-xl"
+      >
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <span className="font-display text-sm font-black uppercase tracking-[-0.01em]">Friend requests</span>
+          {count > 0 && (
+            <span className="rounded-full bg-accent/15 px-2 py-0.5 font-mono text-xs font-bold text-accent">{count}</span>
           )}
         </div>
-        <div className="p-2 border-t text-right">
-          <Button size="sm" variant="ghost" onClick={() => refetch()}>
-            Refresh
-          </Button>
+        <div className="max-h-96 overflow-y-auto">
+          <FriendRequestsList />
         </div>
       </PopoverContent>
     </Popover>

@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
 
     const counterpartUsers = counterpartIds.length
       ? await db
-          .select({ id: users.id, username: users.username, image: users.image })
+          .select({ id: users.id, username: users.username, image: users.image, soloRank: users.soloRank })
           .from(users)
           .where(inArray(users.id, counterpartIds))
       : [];
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
 
     const responseItems = items.map((r) => {
       const otherId = isInbound ? r.senderId : r.receiverId;
-      const otherUser = byId.get(otherId) || { id: otherId, username: null, image: null };
+      const otherUser = byId.get(otherId) || { id: otherId, username: null, image: null, soloRank: null };
       return {
         id: r.id,
         createdAt: r.createdAt,

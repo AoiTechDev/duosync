@@ -1,3 +1,6 @@
+import Link from "next/link";
+import Image from "next/image";
+import { LayoutList, Pencil, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -7,60 +10,87 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
+import { parseRank } from "@/lib/rank";
+import { getUserInitials, getUserAvatarUrl, type AuthUser } from "@/auth";
 import { SignOutButton } from "./SignOutButton";
-import {
-  getUserInitials,
-  getUserDisplayName,
-  getFormattedRank,
-  getUserAvatarUrl,
-  type AuthUser,
-} from "@/auth";
 
-interface ServerUserDropdownProps {
-  user: AuthUser;
+const ITEMS = [
+  { href: "/profile", label: "Profile", icon: UserRound },
+  { href: "/profile/edit", label: "Edit profile", icon: Pencil },
+  { href: "/posts", label: "Posts", icon: LayoutList },
+];
+
+export function UserAvatar({ user, size = 36 }: { user: AuthUser; size?: number }) {
+  const rank = parseRank(user.soloRank);
+  return (
+    <span className="relative inline-flex">
+      <Avatar className="ring-2 ring-primary/40" style={{ width: size, height: size }}>
+        <AvatarImage src={getUserAvatarUrl(user)} alt="" />
+        <AvatarFallback className="bg-linear-to-br from-primary to-accent text-xs font-black text-primary-foreground">
+          {getUserInitials(user.name, user.username)}
+        </AvatarFallback>
+      </Avatar>
+      {rank?.icon && (
+        <span className="absolute -right-1 -bottom-1 flex size-[18px] items-center justify-center rounded-full border border-border bg-card">
+          <Image src={rank.icon} alt="" width={12} height={12} />
+        </span>
+      )}
+    </span>
+  );
 }
 
-export function ServerUserDropdown({ user }: ServerUserDropdownProps) {
+export function RiotTag({ summonerName }: { summonerName: string | null }) {
+  if (!summonerName) return null;
+  const [name, tag] = summonerName.split("#");
+  return (
+    <span className="font-mono">
+      {name}
+      {tag && <span className="text-electric">#{tag}</span>}
+    </span>
+  );
+}
+
+export function ServerUserDropdown({ user }: { user: AuthUser }) {
+  const rank = parseRank(user.soloRank);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          {/* User Display Name */}
-          <div className="hidden sm:flex flex-col items-end">
-            <span className="text-sm font-medium text-foreground">{getUserDisplayName(user)}</span>
-          </div>
-
-          {/* User Avatar */}
-          <Avatar className="h-10 w-10">
-            <AvatarImage
-              src={getUserAvatarUrl(user)}
-              alt={`${getUserDisplayName(user)}'s avatar`}
-            />
-            <AvatarFallback className="bg-primary/10 text-primary font-medium">
-              {getUserInitials(user.name, user.username)}
-            </AvatarFallback>
-          </Avatar>
+        <button
+          aria-label="Account menu"
+          className="cursor-pointer rounded-full outline-none transition-opacity hover:opacity-85 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        >
+          <UserAvatar user={user} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{getUserDisplayName(user)}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={10}
+        className="w-64 rounded-2xl border-border bg-popover/95 p-1.5 shadow-[0_24px_60px_-20px_rgb(0_0_0/0.8)] backdrop-blur-xl"
+      >
+        <DropdownMenuLabel className="flex items-center gap-3 px-2.5 py-2.5">
+          {rank?.icon ? (
+            <Image src={rank.icon} alt="" width={30} height={30} />
+          ) : (
+            <span className="size-[30px] rounded-full border border-dashed border-border" />
+          )}
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold">{user.username}</p>
+            <p className="truncate text-xs font-normal text-muted-foreground">
+              <RiotTag summonerName={user.summonerName} />
+              {!user.summonerName && "Riot ID not linked"}
+            </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/profile">Profile</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/profile/edit">Edit Profile</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/posts">Posts</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-border" />
+        {ITEMS.map(({ href, label, icon: Icon }) => (
+          <DropdownMenuItem key={href} asChild className="cursor-pointer gap-2.5 rounded-lg px-2.5 py-2">
+            <Link href={href}>
+              <Icon className="text-muted-foreground" /> {label}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator className="bg-border" />
         <SignOutButton />
       </DropdownMenuContent>
     </DropdownMenu>

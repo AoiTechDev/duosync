@@ -23,7 +23,11 @@ const RegionEnum = z.enum(regions, { message: "Region is required" });
 const RoleEnum = z.enum(roleEnum.enumValues, { message: "Role is required" });
 
 export const createPostValidator = z.object({
-  description: z.string().min(1, "Description is required"),
+  description: z
+    .string()
+    .trim()
+    .min(1, "Say who you are looking for")
+    .max(280, "At most 280 characters"),
   role: RoleEnum,
   region: RegionEnum,
   rank: RankEnum,

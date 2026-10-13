@@ -45,3 +45,12 @@ export type PostWithAuthor = {
     secondaryRole: string | null;
   };
 };
+
+/** How the signed-in user relates to a post's author (computed by GET /api/posts). */
+export type PostRelation = "self" | "friend" | "sent" | "incoming" | "none";
+
+export type FeedPost = PostWithAuthor & {
+  relation: PostRelation;
+  /** Set when relation is "incoming": the pending request to accept. */
+  requestId?: string;
+};

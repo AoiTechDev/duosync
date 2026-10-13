@@ -3,17 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, X } from "lucide-react";
 import { useOnboardingStore } from "@/store/onboarding-store";
 import { StepShell } from "../StepShell";
-
-// Only regions the database's `region` enum accepts (see src/data/constants.ts).
-const REGIONS = [
-  { value: "EUW1", code: "EUW", label: "Europe West" },
-  { value: "EUN1", code: "EUNE", label: "Europe Nordic & East" },
-  { value: "NA1", code: "NA", label: "North America" },
-  { value: "KR", code: "KR", label: "Korea" },
-  { value: "BR1", code: "BR", label: "Brazil" },
-  { value: "LA1", code: "LAN", label: "Latin America N." },
-  { value: "LA2", code: "LAS", label: "Latin America S." },
-];
+import { REGION_OPTIONS as REGIONS } from "@/data/regions";
 
 type Status = "idle" | "checking" | "available" | "taken";
 

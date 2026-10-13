@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
-import { ProfilePageClient } from "./ProfilePageClient";
+import { ProfileView } from "./ProfileView";
+
+export const metadata: Metadata = { title: "Profile · DuoSync" };
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
@@ -9,5 +12,5 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  return <ProfilePageClient user={user} />;
+  return <ProfileView user={user} />;
 }

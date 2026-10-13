@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/auth/server";
 import { posts } from "@/db/schema";
 import { db } from "@/lib/db";
 import { createPostValidator } from "@/validators/create-post-validator";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 interface CreatePostState {
@@ -110,7 +110,8 @@ export async function editPost(
         region: validatedFields.data.region,
         role: validatedFields.data.role,
       })
-      .where(eq(posts.id, postId));
+      // Only the author may edit their post.
+      .where(and(eq(posts.id, postId), eq(posts.authorId, user.id)));
 
     revalidatePath("/posts");
     return { success: true };
@@ -121,5 +122,29 @@ export async function editPost(
         database: ["Failed to update post"],
       },
     };
+  }
+}
+
+export async function deletePost(postId: string): Promise<{ success: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "You have to be logged in to delete a post" };
+  }
+
+  try {
+    // Soft delete: hidden from the feed, kept in the database.
+    const [deleted] = await db
+      .update(posts)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(and(eq(posts.id, postId), eq(posts.authorId, user.id)))
+      .returning({ id: posts.id });
+
+    if (!deleted) return { success: false, error: "Post not found" };
+
+    revalidatePath("/posts");
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: "Failed to delete post" };
   }
 }

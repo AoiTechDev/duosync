@@ -1,35 +1,48 @@
-import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 import { getCurrentUser } from "@/auth";
-import { ServerUserDropdown } from "./ServerUserDropdown";
+import { parseRank } from "@/lib/rank";
+import { BrandLogo } from "./BrandLogo";
+import { NavLinks } from "./NavLinks";
+import { RiotTag, ServerUserDropdown, UserAvatar } from "./ServerUserDropdown";
 import FriendsDropdown from "./FriendsDropdown";
+import { MobileMenu } from "./MobileMenu";
 
 export default async function Navbar() {
   const user = await getCurrentUser();
+  const rank = parseRank(user?.soloRank);
 
   return (
-    <div className="sticky h-16 top-0 left-0 right-0 z-50 bg-background border-b border-border px-6 md:px-12">
-      <div className="flex items-center justify-between h-full">
-        {/* Logo */}
-        <div className="h-10 w-10 relative">
-          <Image src="/logo.jpeg" alt="DuoSync logo" fill className="object-cover rounded-md" />
-        </div>
-
-        {/* User Section */}
-        <div className="flex items-center gap-3">
-          <FriendsDropdown />
-          {user ? (
-            <ServerUserDropdown user={user} />
-          ) : (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">Not signed in</span>
-              <Avatar>
-                <AvatarFallback>?</AvatarFallback>
-              </Avatar>
+    <header className="sticky top-0 z-50 h-16 border-b border-border bg-background/70 backdrop-blur-xl">
+      <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
+      <div className="mx-auto flex h-full w-full max-w-[1120px] items-center justify-between px-5">
+        <Link href="/posts" aria-label="DuoSync home">
+          <BrandLogo />
+        </Link>
+        <NavLinks />
+        {user && (
+          <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-3 md:flex">
+              <FriendsDropdown />
+              <ServerUserDropdown user={user} />
             </div>
-          )}
-        </div>
+            <MobileMenu
+              userBlock={
+                <div className="flex items-center gap-3">
+                  <UserAvatar user={user} size={44} />
+                  <div className="min-w-0">
+                    <p className="truncate font-bold">{user.username}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      <RiotTag summonerName={user.summonerName} />
+                      {user.summonerName && " · "}
+                      {rank?.label ?? "Unranked"}
+                    </p>
+                  </div>
+                </div>
+              }
+            />
+          </div>
+        )}
       </div>
-    </div>
+    </header>
   );
 }

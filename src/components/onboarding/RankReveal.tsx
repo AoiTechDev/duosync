@@ -1,16 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { RANKS } from "@/data/preferences";
-
-const ROMAN = new Set(["I", "II", "III", "IV"]);
-
-// "DIAMOND_II" -> { tier: "DIAMOND", label: "Diamond II" }; "MASTER" -> { tier: "MASTER", label: "Master" }
-function parseRank(rank?: string | null) {
-  if (!rank) return null;
-  const [tier, division] = rank.split("_");
-  const name = tier.charAt(0) + tier.slice(1).toLowerCase();
-  return { tier, label: division && ROMAN.has(division) ? `${name} ${division}` : name };
-}
+import { parseRank } from "@/lib/rank";
 
 export function RankReveal({
   queue,
@@ -23,8 +13,8 @@ export function RankReveal({
   delay?: number;
 }) {
   const parsed = parseRank(rank);
-  const icon = parsed ? RANKS.find((r) => r.id === parsed.tier)?.icon : undefined;
-  const tierVar = parsed ? `var(--${parsed.tier.toLowerCase()})` : "var(--muted-fg)";
+  const icon = parsed?.icon;
+  const tierVar = parsed?.color ?? "var(--muted-fg)";
   const at = (s: number): CSSProperties => ({ animationDelay: `${delay + s}s` });
 
   return (

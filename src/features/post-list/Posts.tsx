@@ -1,157 +1,241 @@
 "use client";
-import { PostWithAuthor, User } from "@/lib/db";
+import { useMemo, useState, type ReactNode } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import Post from "./components/Post";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, RefreshCw, Wifi } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import PostSkeleton from "@/components/PostSkeleton";
+import { AlertCircle, Loader2, Search } from "lucide-react";
+import type { FeedPost, User } from "@/lib/db";
+import { ROLES } from "@/data/preferences";
+import { REGION_OPTIONS } from "@/data/regions";
+import { parseRank, TIER_ORDER, tierLabel } from "@/lib/rank";
 import { useFormStore } from "@/store/create-post-store";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import EditForm from "./components/EditForm";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CreatePost from "@/features/create-post/CreatePost";
+import PostSkeleton from "@/components/PostSkeleton";
+import Post from "./components/Post";
+import { EditPostDialog } from "./components/EditPostDialog";
 
-const PostsError = ({
-  error,
-  refetch,
-  isRefetching,
+const LANES = ROLES.filter((r) => r.id !== "FILL");
+const RANK_FILTERS = ["GOLD", "PLATINUM", "EMERALD", "DIAMOND", "MASTER"] as const;
+
+function FilterChip({
+  active,
+  onClick,
+  children,
 }: {
-  error: Error;
-  refetch: () => void;
-  isRefetching: boolean;
-}) => {
-  const getErrorMessage = (error: Error) => {
-    if (error.message.includes("fetch")) {
-      return {
-        title: "Connection Error",
-        description: "Unable to connect to the server. Please check your internet connection.",
-        icon: <Wifi className="h-5 w-5" />,
-      };
-    }
-    if (error.message.includes("404")) {
-      return {
-        title: "Posts Not Found",
-        description: "The requested posts could not be found.",
-        icon: <AlertCircle className="h-5 w-5" />,
-      };
-    }
-    return {
-      title: "Something went wrong",
-      description: error.message || "An unexpected error occurred while loading posts.",
-      icon: <AlertCircle className="h-5 w-5" />,
-    };
-  };
-
-  const errorInfo = getErrorMessage(error);
-
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return (
-    <Card className="max-w-2xl mx-auto border border-destructive/20 bg-destructive/5">
-      <CardContent className="p-8 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="p-3 rounded-full bg-destructive/10 text-destructive">
-            {errorInfo.icon}
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg mb-1">{errorInfo.title}</h3>
-            <p className="text-muted-foreground text-sm max-w-md">{errorInfo.description}</p>
-          </div>
-          <Button onClick={refetch} disabled={isRefetching} variant="outline" className="mt-2">
-            {isRefetching ? (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Retrying...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Try Again
-              </>
-            )}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors ${
+        active
+          ? "border-primary bg-primary/[0.08] text-primary shadow-[0_0_12px_color-mix(in_oklab,var(--primary)_25%,transparent)]"
+          : "border-border bg-card/70 text-foreground/85 hover:border-input hover:bg-popover"
+      }`}
+    >
+      {children}
+    </button>
   );
-};
+}
+
+function FilterLabel({ children }: { children: ReactNode }) {
+  return (
+    <span className="shrink-0 font-mono sm:w-14 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+      {children}
+    </span>
+  );
+}
+
+function StateCard({
+  tone = "neutral",
+  icon,
+  title,
+  text,
+  children,
+}: {
+  tone?: "neutral" | "error";
+  icon: ReactNode;
+  title: string;
+  text: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center rounded-2xl border px-6 py-12 text-center ${
+        tone === "error" ? "border-destructive/35 bg-destructive/[0.04]" : "border-border bg-card/70"
+      }`}
+    >
+      <div
+        className={`flex size-11 items-center justify-center rounded-full ${
+          tone === "error" ? "bg-destructive/15 text-destructive" : "bg-popover text-primary"
+        }`}
+      >
+        {icon}
+      </div>
+      <h3 className="mt-4 font-display text-[18px] font-black uppercase tracking-[-0.02em]">{title}</h3>
+      <p className="mt-1 max-w-xs text-sm text-muted-foreground">{text}</p>
+      {children && <div className="mt-5 flex gap-2">{children}</div>}
+    </div>
+  );
+}
 
 const Posts = ({ user }: { user: User }) => {
-  const { data, error, isLoading, isFetching, isError, refetch } = useQuery({
+  const [role, setRole] = useState<string | null>(null);
+  const [minTier, setMinTier] = useState<string | null>(null);
+  const [region, setRegion] = useState<string>("ALL");
+  const { setShouldOpenCreateDialog } = useFormStore();
+
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["posts"],
-    queryFn: async () => {
+    queryFn: async (): Promise<{ posts: FeedPost[] }> => {
       const response = await fetch("/api/posts");
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data;
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
     },
-    retry: (failureCount, error) => {
-      if (error instanceof Error && error.message.includes("4")) {
-        return false;
-      }
-
-      return failureCount < 3;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    retry: (failureCount, error) => !error.message.startsWith("HTTP 4") && failureCount < 2,
+    staleTime: 60 * 1000,
   });
 
-  console.log(data);
-  const { shouldOpenEditDialog, setShouldOpenEditDialog, postId } = useFormStore();
+  const filtered = useMemo(() => {
+    const minIndex = minTier ? TIER_ORDER.indexOf(minTier as (typeof TIER_ORDER)[number]) : -1;
+    return (data?.posts ?? []).filter(
+      (p) =>
+        (!role || p.role === role) &&
+        (region === "ALL" || p.region === region) &&
+        (minIndex < 0 || (parseRank(p.author.soloRank)?.index ?? -1) >= minIndex),
+    );
+  }, [data, role, minTier, region]);
 
-  if (isLoading) {
-    return <PostSkeleton />;
-  }
-
-  if (isError && error) {
-    return <PostsError error={error} refetch={refetch} isRefetching={isFetching} />;
-  }
+  const hasFilters = !!role || !!minTier || region !== "ALL";
+  const clearFilters = () => {
+    setRole(null);
+    setMinTier(null);
+    setRegion("ALL");
+  };
 
   return (
-    <div className="space-y-4">
-      {isFetching && (
-        <div className="flex items-center justify-center py-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-            <RefreshCw className="h-3 w-3 animate-spin" />
-            Updating posts...
+    <div className="space-y-6">
+      {/* Filters */}
+      <div className="space-y-4 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-sm sm:space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <FilterLabel>Role</FilterLabel>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip active={!role} onClick={() => setRole(null)}>
+              All
+            </FilterChip>
+            {LANES.map((r) => (
+              <FilterChip key={r.id} active={role === r.id} onClick={() => setRole(role === r.id ? null : r.id)}>
+                <Image src={r.icon} alt="" width={14} height={14} />
+                {r.name.replace(" Lane", "")}
+              </FilterChip>
+            ))}
           </div>
+        </div>
+        <div className="flex flex-col gap-4 sm:gap-3 lg:flex-row lg:items-center">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <FilterLabel>Rank</FilterLabel>
+            <div className="flex flex-wrap gap-2">
+              {RANK_FILTERS.map((tier) => {
+                const parsed = parseRank(tier);
+                return (
+                  <FilterChip
+                    key={tier}
+                    active={minTier === tier}
+                    onClick={() => setMinTier(minTier === tier ? null : tier)}
+                  >
+                    {parsed?.icon && <Image src={parsed.icon} alt="" width={16} height={16} />}
+                    {tierLabel(tier)}+
+                  </FilterChip>
+                );
+              })}
+            </div>
+          </div>
+          <div className="hidden h-6 w-px bg-border lg:block" />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <FilterLabel>Region</FilterLabel>
+            <Select value={region} onValueChange={setRegion}>
+              <SelectTrigger
+                size="sm"
+                className={`h-8 w-full rounded-full px-3 text-xs font-semibold sm:w-auto ${
+                  region !== "ALL" ? "border-primary text-primary" : "border-border"
+                }`}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All regions</SelectItem>
+                {REGION_OPTIONS.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    <span className="font-mono text-[10px] font-bold text-electric">{r.code}</span>
+                    {r.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <CreatePost user={user} />
+
+      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <span>
+          {isLoading ? "Loading requests" : `${filtered.length} duo request${filtered.length === 1 ? "" : "s"}`}{" "}
+          · newest first
+        </span>
+        {isFetching && !isLoading && <Loader2 className="size-3.5 animate-spin" />}
+      </div>
+
+      {isLoading ? (
+        <div className="grid gap-5 md:grid-cols-2">
+          {Array.from({ length: 4 }, (_, i) => (
+            <PostSkeleton key={i} />
+          ))}
+        </div>
+      ) : isError ? (
+        <StateCard
+          tone="error"
+          icon={<AlertCircle className="size-5" />}
+          title="Feed didn't load"
+          text="Check your connection and try again."
+        >
+          <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching && <Loader2 className="animate-spin" />} Retry
+          </Button>
+        </StateCard>
+      ) : filtered.length === 0 ? (
+        <StateCard
+          icon={<Search className="size-5" />}
+          title="No duos match"
+          text={
+            hasFilters
+              ? "Widen your filters or be the first to post for this queue."
+              : "Nobody is looking right now. Be the first to post."
+          }
+        >
+          {hasFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          )}
+          <Button size="sm" onClick={() => setShouldOpenCreateDialog(true)}>
+            Post a duo request
+          </Button>
+        </StateCard>
+      ) : (
+        <div className="grid items-start gap-5 md:grid-cols-2">
+          {filtered.map((post) => (
+            <Post key={post.id} post={post} />
+          ))}
         </div>
       )}
 
-      {data.posts && data.posts.length > 0 ? (
-        <>
-          {data.posts.map((post: PostWithAuthor) => (
-            <Post key={post.id} post={post} user={user} />
-          ))}
-          <Dialog open={shouldOpenEditDialog} onOpenChange={setShouldOpenEditDialog}>
-            <DialogContent className="sm:max-w-2xl">
-              <DialogTitle>Edit your post</DialogTitle>
-              <DialogDescription>
-                Make changes to your post. Click save when you&apos;re done.
-              </DialogDescription>
-              {postId && <EditForm postId={postId} />}
-            </DialogContent>
-          </Dialog>
-        </>
-      ) : (
-        <Card className="max-w-2xl mx-auto border border-border/30 bg-card">
-          <CardContent className="p-8 text-center">
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-3 rounded-full bg-muted">
-                <AlertCircle className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">No posts yet</h3>
-                <p className="text-muted-foreground text-sm">
-                  Be the first to create a post and find your duo partner!
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <EditPostDialog />
     </div>
   );
 };
