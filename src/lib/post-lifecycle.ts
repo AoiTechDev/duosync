@@ -1,3 +1,4 @@
+export const POSTS_EXPIRE = false;
 export const POST_TTL_MS = 24 * 60 * 60 * 1000;
 export const BUMP_COOLDOWN_MS = 60 * 60 * 1000;
 export const ONLINE_WINDOW_MS = 5 * 60 * 1000;
@@ -6,7 +7,7 @@ export const HEARTBEAT_MS = 60 * 1000;
 const toTime = (d: Date | string | null | undefined) => (d ? new Date(d).getTime() : 0);
 
 export function isExpired(expiresAt: Date | string, now = Date.now()) {
-  return toTime(expiresAt) <= now;
+  return POSTS_EXPIRE && toTime(expiresAt) <= now;
 }
 
 export function bumpAvailableAt(bumpedAt: Date | string) {

@@ -18,7 +18,7 @@ import { acceptFriendRequest, sendFriendRequest } from "@/features/friends/api";
 import { bumpPost, deletePost } from "@/app/(dashboard)/feed/actions";
 import { OnlineDot } from "@/components/presence/OnlineDot";
 import { ClampedText } from "./ClampedText";
-import { bumpAvailableAt, formatDuration, isExpired } from "@/lib/post-lifecycle";
+import { bumpAvailableAt, formatDuration, isExpired, POSTS_EXPIRE } from "@/lib/post-lifecycle";
 
 const AVATAR_GRADIENTS = [
   "from-primary to-accent",
@@ -222,12 +222,14 @@ const Post = ({ post, now }: { post: FeedPost; now: number }) => {
             <>
               <div className="min-w-0">
                 <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">Your post</div>
-                <div
-                  className={`mt-0.5 flex items-center gap-1 text-xs ${expired ? "text-accent" : "text-muted-foreground"}`}
-                >
-                  <Hourglass className="size-3" />
-                  {expired ? "Expired · hidden from the feed" : `Live for ${formatDuration(timeLeft)}`}
-                </div>
+                {POSTS_EXPIRE && (
+                  <div
+                    className={`mt-0.5 flex items-center gap-1 text-xs ${expired ? "text-accent" : "text-muted-foreground"}`}
+                  >
+                    <Hourglass className="size-3" />
+                    {expired ? "Expired · hidden from the feed" : `Live for ${formatDuration(timeLeft)}`}
+                  </div>
+                )}
                 {(bump.error ?? removePost.error) && (
                   <div className="mt-0.5 text-xs text-destructive">{(bump.error ?? removePost.error)?.message}</div>
                 )}

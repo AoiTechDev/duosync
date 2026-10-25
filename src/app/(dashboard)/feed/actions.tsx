@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { createPostValidator } from "@/validators/create-post-validator";
 import { and, count, eq, gt, sql } from "drizzle-orm";
 import { rateLimit } from "@/lib/rate-limit";
-import { bumpAvailableAt, formatDuration, POST_TTL_MS } from "@/lib/post-lifecycle";
+import { bumpAvailableAt, formatDuration, POST_TTL_MS, POSTS_EXPIRE } from "@/lib/post-lifecycle";
 import { revalidatePath } from "next/cache";
 
 const MAX_LIVE_POSTS = 3;
@@ -55,10 +55,22 @@ export async function createPost(
     const [{ live }] = await db
       .select({ live: count() })
       .from(posts)
-      .where(and(eq(posts.authorId, user.id), eq(posts.isActive, true), gt(posts.expiresAt, sql`now()`)));
+      .where(
+        and(
+          eq(posts.authorId, user.id),
+          eq(posts.isActive, true),
+          POSTS_EXPIRE ? gt(posts.expiresAt, sql`now()`) : undefined,
+        ),
+      );
     if (live >= MAX_LIVE_POSTS) {
       return {
-        errors: { database: [`You already have ${MAX_LIVE_POSTS} live posts. Bump or delete one first.`] },
+        errors: {
+          database: [
+            POSTS_EXPIRE
+              ? `You already have ${MAX_LIVE_POSTS} live posts. Bump or delete one first.`
+              : `You can have up to ${MAX_LIVE_POSTS} posts. Delete one to post again.`,
+          ],
+        },
       };
     }
 

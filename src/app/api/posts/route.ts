@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/auth";
 import { friendRequests, friendships, posts, users } from "@/db/schema";
 import { db } from "@/lib/db";
 import { and, desc, eq, gt, or, sql } from "drizzle-orm";
+import { POSTS_EXPIRE } from "@/lib/post-lifecycle";
 import { NextResponse } from "next/server";
 
 const FEED_LIMIT = 500;
@@ -63,7 +64,7 @@ export async function GET() {
         .where(
           and(
             eq(posts.isActive, true),
-            or(gt(posts.expiresAt, sql`now()`), eq(posts.authorId, me.id)),
+            POSTS_EXPIRE ? or(gt(posts.expiresAt, sql`now()`), eq(posts.authorId, me.id)) : undefined,
           ),
         )
         .orderBy(desc(posts.bumpedAt))

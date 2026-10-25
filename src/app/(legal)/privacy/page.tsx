@@ -116,8 +116,8 @@ export default function PrivacyPage() {
       <LegalSection title="6. How long we keep data">
         <p>
           We keep your account data, profile, posts and friend connections for as long as your account exists. Duo
-          posts stop being shown to others 24 hours after they were last bumped, but stay stored with your account so
-          you can bump them again. Rate-limit counters expire within minutes. When you delete your account, we remove
+          posts stay visible until you delete them; deleted posts are hidden from everyone and stay stored with your
+          account. Rate-limit counters expire within minutes. When you delete your account, we remove
           your data within 30 days, unless the law requires us to keep something longer.
         </p>
       </LegalSection>
