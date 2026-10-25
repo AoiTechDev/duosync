@@ -106,6 +106,15 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token }) {
+      // Store the DB user id once so lightweight routes can read it via getToken() without a query.
+      if (!token.id && token.email) {
+        const [dbUser] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.email, token.email))
+          .limit(1);
+        if (dbUser) token.id = dbUser.id;
+      }
       return token;
     },
 

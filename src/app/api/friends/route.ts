@@ -12,17 +12,22 @@ export async function GET() {
     }
 
     const rows = await db
-      .select({ userAId: friendships.userAId, userBId: friendships.userBId, since: friendships.createdAt })
+      .select({
+        friendshipId: friendships.id,
+        userAId: friendships.userAId,
+        userBId: friendships.userBId,
+        since: friendships.createdAt,
+      })
       .from(friendships)
       .where(or(eq(friendships.userAId, me.id), eq(friendships.userBId, me.id)));
 
-    const sinceById = new Map(
+    const rowById = new Map(
       rows
-        .map((r) => [r.userAId === me.id ? r.userBId : r.userAId, r.since] as const)
+        .map((r) => [r.userAId === me.id ? r.userBId : r.userAId, r] as const)
         .filter(([id]) => id !== me.id),
     );
 
-    const friends = sinceById.size
+    const friends = rowById.size
       ? await db
           .select({
             id: users.id,
@@ -37,11 +42,14 @@ export async function GET() {
             lastSeenAt: users.lastSeenAt,
           })
           .from(users)
-          .where(inArray(users.id, [...sinceById.keys()]))
+          .where(inArray(users.id, [...rowById.keys()]))
       : [];
 
     const items = friends
-      .map((f) => ({ ...f, since: sinceById.get(f.id)! }))
+      .map((f) => {
+        const { since, friendshipId } = rowById.get(f.id)!;
+        return { ...f, since, friendshipId };
+      })
       .sort((x, y) => x.username.localeCompare(y.username));
 
     return NextResponse.json({ items }, { headers: { "Cache-Control": "no-store" } });

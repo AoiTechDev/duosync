@@ -4,7 +4,7 @@ import Image from "next/image";
 import { RankBadge } from "@/components/RankBadge";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, Loader2, Lock, UserMinus, Users } from "lucide-react";
+import { Check, Copy, Loader2, Lock, MessageCircle, UserMinus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FriendRequestsList, useInboundRequests } from "@/components/friends/FriendRequestsList";
 import { RequestCount } from "@/components/FriendsDropdown";
@@ -29,6 +29,7 @@ type Friend = {
   mainRole: string | null;
   lastSeenAt: string | null;
   since: string;
+  friendshipId: string;
 };
 
 type OutboundRequest = {
@@ -192,16 +193,23 @@ function FriendCard({ friend, now }: { friend: Friend; now: number }) {
           Friends since{" "}
           {new Date(friend.since).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
         </span>
-        <Button
-          size="sm"
-          variant={confirm ? "destructive" : "ghost"}
-          disabled={remove.isPending}
-          onClick={() => (confirm ? remove.mutate() : setConfirm(true))}
-          onBlur={() => setConfirm(false)}
-        >
-          {remove.isPending ? <Loader2 className="animate-spin" /> : <UserMinus />}
-          {confirm ? "Confirm remove" : "Remove"}
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button asChild size="sm" variant="ghost">
+            <Link href={`/messages/${friend.friendshipId}`}>
+              <MessageCircle /> Message
+            </Link>
+          </Button>
+          <Button
+            size="sm"
+            variant={confirm ? "destructive" : "ghost"}
+            disabled={remove.isPending}
+            onClick={() => (confirm ? remove.mutate() : setConfirm(true))}
+            onBlur={() => setConfirm(false)}
+          >
+            {remove.isPending ? <Loader2 className="animate-spin" /> : <UserMinus />}
+            {confirm ? "Confirm remove" : "Remove"}
+          </Button>
+        </div>
       </div>
       {remove.error && <p className="relative mt-2 text-xs text-destructive">{remove.error.message}</p>}
     </article>
