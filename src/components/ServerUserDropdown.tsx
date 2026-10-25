@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { parseRank } from "@/lib/rank";
 import { getUserInitials, getUserAvatarUrl, type AuthUser } from "@/auth";
+import { ReportBugMenuItem } from "@/features/report-bug/ReportBugDialog";
 import { SignOutButton } from "./SignOutButton";
 
 const ITEMS = [
@@ -88,6 +89,7 @@ export function ServerUserDropdown({ user }: { user: AuthUser }) {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator className="bg-border" />
+        <ReportBugMenuItem />
         <SignOutButton />
       </DropdownMenuContent>
     </DropdownMenu>

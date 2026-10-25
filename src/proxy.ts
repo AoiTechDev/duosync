@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import type { NextRequestWithAuth } from "next-auth/middleware";
 import { getToken } from "next-auth/jwt";
 
+const PUBLIC_PATHS = new Set(["/login", "/privacy", "/terms"]);
+
 export default withAuth(
   async function middleware(req: NextRequestWithAuth) {
     const { pathname } = req.nextUrl;
@@ -12,7 +14,7 @@ export default withAuth(
       pathname.startsWith("/_next/") ||
       pathname.startsWith("/favicon.ico") ||
       pathname.startsWith("/opengraph-image") ||
-      pathname === "/login"
+      PUBLIC_PATHS.has(pathname)
     ) {
       return NextResponse.next();
     }
@@ -34,7 +36,7 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
 
-        if (pathname === "/login") return true;
+        if (PUBLIC_PATHS.has(pathname)) return true;
 
         if (pathname === "/") return true;
 

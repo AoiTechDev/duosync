@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/auth";
 import { isDemoLoginEnabled } from "@/auth/demo";
@@ -62,8 +63,14 @@ export async function Landing() {
             <AuthButtons demo={isDemoLoginEnabled()} />
             <p className="text-xs text-muted-foreground">
               By continuing you agree to the{" "}
-              <span className="text-electric underline underline-offset-2">Terms</span> and{" "}
-              <span className="text-electric underline underline-offset-2">Privacy Policy</span>.
+              <Link href="/terms" className="text-electric underline underline-offset-2 hover:text-foreground">
+                Terms
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-electric underline underline-offset-2 hover:text-foreground">
+                Privacy Policy
+              </Link>
+              .
             </p>
           </div>
         </section>
@@ -83,10 +90,20 @@ export async function Landing() {
           ))}
         </section>
 
-        <footer className="mt-10 max-w-[860px] text-[11px] leading-relaxed text-muted-foreground/70">
+        <footer className="mt-10 max-w-[860px] space-y-3 text-[11px] leading-relaxed text-muted-foreground/70">
+          <nav className="flex gap-5 text-xs text-muted-foreground">
+            <Link href="/terms" className="hover:text-foreground">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy Policy
+            </Link>
+          </nav>
+          <p>
           {SITE_NAME} isn&apos;t endorsed by Riot Games and doesn&apos;t reflect the views or opinions of Riot Games or
           anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated
           properties are trademarks or registered trademarks of Riot Games, Inc.
+          </p>
         </footer>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

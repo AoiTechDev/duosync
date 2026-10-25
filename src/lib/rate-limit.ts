@@ -6,6 +6,7 @@ const LIMITS = {
   checkUsername: { limit: 30, window: "60 s" },
   friendRequest: { limit: 10, window: "60 s" },
   createPost: { limit: 5, window: "60 s" },
+  bugReport: { limit: 3, window: "10 m" },
 } satisfies Record<string, { limit: number; window: Duration }>;
 
 export type RateLimitName = keyof typeof LIMITS;

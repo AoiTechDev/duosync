@@ -3,7 +3,8 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LogOut, Menu, X } from "lucide-react";
+import { Bug, LogOut, Menu, X } from "lucide-react";
+import { useReportBug } from "@/features/report-bug/store";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { FriendRequestsList, useInboundRequests } from "./friends/FriendRequestsList";
 import { RequestCount } from "./FriendsDropdown";
@@ -18,6 +19,7 @@ const LINKS = [
 export function MobileMenu({ userBlock }: { userBlock: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const openReportBug = useReportBug((s) => s.setOpen);
   const { data } = useInboundRequests();
   const count = data?.items.length ?? 0;
 
@@ -81,6 +83,16 @@ export function MobileMenu({ userBlock }: { userBlock: ReactNode }) {
         </section>
 
         <div className="mt-auto border-t border-border px-3 py-3">
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              openReportBug(true);
+            }}
+            className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-semibold text-muted-foreground hover:bg-card hover:text-foreground"
+          >
+            <Bug className="size-4" /> Report a bug
+          </button>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/login" })}

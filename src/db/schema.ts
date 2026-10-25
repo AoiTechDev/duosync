@@ -219,6 +219,22 @@ export const friendRequests = pgTable(
   }),
 );
 
+export const bugReports = pgTable(
+  "bug_reports",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    category: text("category").notNull(),
+    message: text("message").notNull(),
+    pageUrl: text("page_url"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    createdAtIdx: index().on(table.createdAt),
+  }),
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),

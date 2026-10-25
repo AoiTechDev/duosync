@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/auth";
 import { redirect } from "next/navigation";
 import { QueryProvider } from "@/wrappers/QueryProvider";
 import { Heartbeat } from "@/components/presence/Heartbeat";
+import { ReportBugDialog } from "@/features/report-bug/ReportBugDialog";
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getCurrentUser();
@@ -23,6 +24,7 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
         <Navbar />
         {children}
       </div>
+      <ReportBugDialog />
     </QueryProvider>
   );
 };
