@@ -12,6 +12,7 @@ import { RequestCount } from "./FriendsDropdown";
 const LINKS = [
   { href: "/feed", label: "Feed" },
   { href: "/friends", label: "Friends" },
+  { href: "/messages", label: "Messages" },
   { href: "/profile", label: "Profile" },
   { href: "/profile/edit", label: "Edit profile" },
 ];

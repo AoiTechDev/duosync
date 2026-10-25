@@ -81,6 +81,9 @@ export const friendshipStatusEnum = pgEnum("friendship_status", [
   "CANCELED",
 ]);
 
+export const messageTypeEnum = pgEnum("message_type", ["TEXT", "GAME_INVITE"]);
+export type MessageType = (typeof messageTypeEnum.enumValues)[number];
+
 export const users = pgTable(
   "users",
   {
@@ -191,12 +194,51 @@ export const friendships = pgTable(
       .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    lastMessageAt: timestamp("last_message_at"),
   },
   (table) => ({
     uniqueFriendship: unique().on(table.userAId, table.userBId),
     userAIdx: index().on(table.userAId),
     userBIdx: index().on(table.userBId),
     orderedPair: check("friendships_ordered_pair", sql`${table.userAId} < ${table.userBId}`),
+  }),
+);
+
+export type GameInviteMetadata = { proposedTime?: string; gameMode?: GameMode };
+
+export const messages = pgTable(
+  "messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    friendshipId: uuid("friendship_id")
+      .references(() => friendships.id, { onDelete: "cascade" })
+      .notNull(),
+    senderId: uuid("sender_id")
+      .references(() => users.id)
+      .notNull(),
+    type: messageTypeEnum("type").default("TEXT").notNull(),
+    body: text("body").notNull(),
+    metadata: json("metadata").$type<GameInviteMetadata>(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    threadIdx: index().on(table.friendshipId, table.createdAt),
+  }),
+);
+
+export const conversationReads = pgTable(
+  "conversation_reads",
+  {
+    friendshipId: uuid("friendship_id")
+      .references(() => friendships.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id)
+      .notNull(),
+    lastReadAt: timestamp("last_read_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    compoundKey: primaryKey({ columns: [table.friendshipId, table.userId] }),
   }),
 );
 
@@ -244,6 +286,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   receivedFriendships: many(friendships, {
     relationName: "friendshipReceiver",
   }),
+  sentMessages: many(messages),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -257,6 +300,43 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const postsRelations = relations(posts, ({ one }) => ({
   author: one(users, {
     fields: [posts.authorId],
+    references: [users.id],
+  }),
+}));
+
+export const friendshipsRelations = relations(friendships, ({ one, many }) => ({
+  userA: one(users, {
+    fields: [friendships.userAId],
+    references: [users.id],
+    relationName: "friendshipSender",
+  }),
+  userB: one(users, {
+    fields: [friendships.userBId],
+    references: [users.id],
+    relationName: "friendshipReceiver",
+  }),
+  messages: many(messages),
+  reads: many(conversationReads),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  friendship: one(friendships, {
+    fields: [messages.friendshipId],
+    references: [friendships.id],
+  }),
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+  }),
+}));
+
+export const conversationReadsRelations = relations(conversationReads, ({ one }) => ({
+  friendship: one(friendships, {
+    fields: [conversationReads.friendshipId],
+    references: [friendships.id],
+  }),
+  user: one(users, {
+    fields: [conversationReads.userId],
     references: [users.id],
   }),
 }));

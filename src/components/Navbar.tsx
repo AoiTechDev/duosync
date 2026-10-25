@@ -6,6 +6,7 @@ import { NavLinks } from "./NavLinks";
 import { RiotTag, ServerUserDropdown, UserAvatar } from "./ServerUserDropdown";
 import FriendsDropdown from "./FriendsDropdown";
 import { MobileMenu } from "./MobileMenu";
+import { UnreadMessagesButton } from "@/features/chat/components/UnreadMessagesButton";
 
 export default async function Navbar() {
   const user = await getCurrentUser();
@@ -22,6 +23,7 @@ export default async function Navbar() {
         {user && (
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-3 md:flex">
+              <UnreadMessagesButton />
               <FriendsDropdown />
               <ServerUserDropdown user={user} />
             </div>

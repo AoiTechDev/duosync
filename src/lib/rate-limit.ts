@@ -1,5 +1,6 @@
 import { Ratelimit, type Duration } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import type { Redis } from "@upstash/redis";
+import { redis } from "@/lib/redis";
 
 const LIMITS = {
   verifySummoner: { limit: 5, window: "60 s" },
@@ -7,15 +8,11 @@ const LIMITS = {
   friendRequest: { limit: 10, window: "60 s" },
   createPost: { limit: 5, window: "60 s" },
   bugReport: { limit: 3, window: "10 m" },
+  sendMessage: { limit: 30, window: "60 s" },
 } satisfies Record<string, { limit: number; window: Duration }>;
 
 export type RateLimitName = keyof typeof LIMITS;
 export type RateLimitResult = { ok: boolean; retryAfter: number };
-
-const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Redis({ url: process.env.UPSTASH_REDIS_REST_URL, token: process.env.UPSTASH_REDIS_REST_TOKEN })
-    : null;
 
 if (!redis && process.env.NODE_ENV === "production") {
   console.warn("UPSTASH_REDIS_REST_URL/TOKEN missing: rate limits fall back to per-instance memory");
